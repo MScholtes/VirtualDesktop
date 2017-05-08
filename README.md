@@ -1,6 +1,7 @@
 # VirtualDesktop
 
-C# command line tool to manage virtual desktops in Windows 10
+C# command line tool to manage virtual desktops in Windows 10<br><br> 
+(look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5)
 
 <b>Generate:</b><br>
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
