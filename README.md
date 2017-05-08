@@ -2,8 +2,10 @@
 
 C# command line tool to manage virtual desktops in Windows 10
 
+<b>Generate:</b><br>
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
 
+<b>Description:</b><br>
 Command line tool to manage the virtual desktops of Windows 10.
 Parameters can be given as a sequence of commands. The result - most of thetimes the number of the processed desktop - can be used as input for the next parameter. The result of the last command is returned as error level.
 Virtual desktop numbers start with 0.
@@ -42,7 +44,7 @@ Virtual desktop numbers start with 0.
 /WaitKey         wait for key press (short: /wk).<br>
 /Sleep[:(n)]     wait for (n) milliseconds.<br>
 <br>
-Examples:<br>
+<b>Examples:</b><br>
 Virtualdesktop.exe -New -Switch -GetCurrentDesktop<br>
 Virtualdesktop.exe sleep:200 gd:1 mw:notepad s<br>
 Virtualdesktop.exe /Count /continue /Remove /Remove /Count<br>
