@@ -3,15 +3,17 @@
 C# command line tool to manage virtual desktops in Windows 10<br><br> 
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5)
 
-<b>Generate:</b><br>
+**With Windows 10 1803 Microsoft changed the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide two versions of virtualdesktop.cs now: virutaldesktop.cs is for Windows 10 1803, virtualdesktop1709.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat will generate both executables (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
+
+**Generate:**<br>
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
 
-<b>Description:</b><br>
+**Description:**<br>
 Command line tool to manage the virtual desktops of Windows 10.
 Parameters can be given as a sequence of commands. The result - most of thetimes the number of the processed desktop - can be used as input for the next parameter. The result of the last command is returned as error level.
 Virtual desktop numbers start with 0.
 
-<b>Parameters (leading / can be omitted or - can be used instead):</b><br>
+**Parameters (leading / can be omitted or - can be used instead):**<br>
 /Help /h /?      this help screen.<br>
 /Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).<br>
 /Break /Continue break (default) or continue on error.<br>
@@ -45,7 +47,7 @@ Virtual desktop numbers start with 0.
 /WaitKey         wait for key press (short: /wk).<br>
 /Sleep[:(n)]     wait for (n) milliseconds.<br>
 <br>
-<b>Examples:</b><br>
+**Examples:**<br>
 Virtualdesktop.exe -New -Switch -GetCurrentDesktop<br>
 Virtualdesktop.exe sleep:200 gd:1 mw:notepad s<br>
 Virtualdesktop.exe /Count /continue /Remove /Remove /Count<br>
