@@ -1,7 +1,7 @@
 // Author: Markus Scholtes, 2018
-// Version for Windows 10 1803
+// Version for Windows 10 1607 to 1709 or Windows Server 2016
 // Compile with:
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
+// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1709.cs
 
 using System;
 using System.Runtime.InteropServices;
@@ -53,7 +53,7 @@ namespace VirtualDesktop
 
 	[ComImport]
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	[Guid("871F602A-2B58-42B4-8C4B-6C43D642C06F")]
+	[Guid("9AC0B5C8-1484-4C5B-9533-4134A0F97CEA")]
 	internal interface IApplicationView
 	{
 		int SetFocus();
@@ -83,9 +83,12 @@ namespace VirtualDesktop
 		int CanReceiveInput(out bool canReceiveInput);
 		int GetCompatibilityPolicyType(out APPLICATION_VIEW_COMPATIBILITY_POLICY flags);
 		int SetCompatibilityPolicyType(APPLICATION_VIEW_COMPATIBILITY_POLICY flags);
+		int GetPositionPriority(out IntPtr /* IShellPositionerPriority** */ priority);
+		int SetPositionPriority(IntPtr /* IShellPositionerPriority* */ priority);
 		int GetSizeConstraints(IntPtr /* IImmersiveMonitor* */ monitor, out Size size1, out Size size2);
 		int GetSizeConstraintsForDpi(uint uint1, out Size size1, out Size size2);
 		int SetSizeConstraintsForDpi(ref uint uint1, ref Size size1, ref Size size2);
+		int QuerySizeConstraintsFromApp();
 		int OnMinSizePreferencesUpdated(IntPtr hwnd);
 		int ApplyOperation(IntPtr /* IApplicationViewOperation* */ operation);
 		int IsTray(out bool isTray);
@@ -96,10 +99,6 @@ namespace VirtualDesktop
 		int EnumerateOwnershipTree(out IObjectArray ownershipTree);
 		int GetEnterpriseId([MarshalAs(UnmanagedType.LPWStr)] out string enterpriseId);
 		int IsMirrored(out bool isMirrored);
-		int Unknown1(out int unknown);
-		int Unknown2(out int unknown);
-		int Unknown3(out int unknown);
-		int Unknown4(out int unknown);
 	}
 
 	[ComImport]
