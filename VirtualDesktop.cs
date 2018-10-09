@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2018
-// Version for Windows 10 1803
+// Version for Windows 10 1809
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
 
@@ -100,6 +100,14 @@ namespace VirtualDesktop
 		int Unknown2(out int unknown);
 		int Unknown3(out int unknown);
 		int Unknown4(out int unknown);
+		int Unknown5(out int unknown);
+		int Unknown6(int unknown);
+		int Unknown7();
+		int Unknown8(out int unknown);
+		int Unknown9(int unknown);
+		int Unknown10(int unknownX, int unknownY);
+		int Unknown11(int unknown);
+		int Unknown12(out Size size1);
 	}
 
 	[ComImport]
@@ -116,7 +124,6 @@ namespace VirtualDesktop
 		int GetViewInFocus(out IntPtr view);
 		void outreshCollection();
 		int RegisterForApplicationViewChanges(object listener, out int cookie);
-		int RegisterForApplicationViewPositionChanges(object listener, out int cookie);
 		int UnregisterForApplicationViewChanges(int cookie);
 	}
 
