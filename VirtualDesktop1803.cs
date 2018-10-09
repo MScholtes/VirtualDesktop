@@ -1,7 +1,7 @@
 // Author: Markus Scholtes, 2018
 // Version for Windows 10 1803
 // Compile with:
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
+// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1803.cs
 
 using System;
 using System.Runtime.InteropServices;
