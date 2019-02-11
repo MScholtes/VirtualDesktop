@@ -1,4 +1,5 @@
-// Author: Markus Scholtes, 2018
+// Author: Markus Scholtes, 2019
+// Version 1.3
 // Version for Windows 10 1607 to 1709 or Windows Server 2016
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1709.cs
@@ -383,6 +384,11 @@ namespace VirtualDesktop
 			}
 		}
 
+		public void MoveActiveWindow()
+		{
+			MoveWindow(GetForegroundWindow());
+		}
+
 		public bool HasWindow(IntPtr hWnd)
 		{ // Returns true if window <hWnd> is on this desktop
 			if (hWnd == IntPtr.Zero) throw new ArgumentNullException();
@@ -445,6 +451,10 @@ namespace VirtualDesktop
 		// Get process id to window handle
 		[DllImport("user32.dll")]
 		public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+
+		// Get handle of active window
+		[DllImport("user32.dll")]
+		public static extern IntPtr GetForegroundWindow();
 	}
 }
 
@@ -499,11 +509,13 @@ namespace VDeskTool
 								break;
 
 							case "BREAK": // break on error
+							case "B":
 								if (verbose) Console.WriteLine("Break on error enabled");
 								breakonerror = true;
 								break;
 
 							case "CONTINUE": // continue on error
+							case "CO":
 								if (verbose) Console.WriteLine("Break on error disabled");
 								breakonerror = false;
 								break;
@@ -553,6 +565,7 @@ namespace VDeskTool
 								break;
 
 							case "LEFT": // switch to desktop to the left
+							case "L":
 								if (verbose) Console.Write("Switching to left virtual desktop");
 								try
 								{ // activate virtual desktop to the left
@@ -568,6 +581,7 @@ namespace VDeskTool
 								break;
 
 							case "RIGHT": // switch to desktop to the right
+							case "RI":
 								if (verbose) Console.Write("Switching to right virtual desktop");
 								try
 								{ // activate virtual desktop to the right
@@ -606,6 +620,21 @@ namespace VDeskTool
 								}
 								catch
 								{ // error while removing
+									rc = -1;
+								}
+								break;
+
+							case "MOVEACTIVEWINDOW": // move active window to desktop in rc
+							case "MAW":
+								if (verbose) Console.WriteLine("Moving active window to virtual desktop " + rc.ToString());
+								try
+								{ // move active window
+									VirtualDesktop.Desktop.FromIndex(rc).MoveActiveWindow();
+									if (verbose) Console.WriteLine("Active window moved to desktop " + rc.ToString());
+								}
+								catch
+								{ // error while moving
+									if (verbose) Console.WriteLine("No active window or move failed");
 									rc = -1;
 								}
 								break;
@@ -1111,6 +1140,7 @@ namespace VDeskTool
 								break;
 
 							case "SLEEP": //wait
+							case "SL":
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // check if parameter is an integer
 									if (iParam > 0)
@@ -1163,7 +1193,7 @@ namespace VDeskTool
 
     static void HelpScreen()
     {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\t\tMarkus Scholtes, 2017\n");
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.13\n");
 
     	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
     	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
@@ -1173,7 +1203,7 @@ namespace VDeskTool
     	Console.WriteLine("Parameters (leading / can be omitted or - can be used instead):\n");
     	Console.WriteLine("/Help /h /?      this help screen.");
     	Console.WriteLine("/Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).");
-    	Console.WriteLine("/Break /Continue break (default) or continue on error.");
+    	Console.WriteLine("/Break /Continue break (default) or continue on error (short: /b and /co).");
     	Console.WriteLine("/Count           get count of virtual desktops to pipeline (short: /c).");
     	Console.WriteLine("/GetDesktop:<n>  get number of virtual desktop <n> to pipeline (short: /gd).");
     	Console.WriteLine("/GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).");
@@ -1181,8 +1211,10 @@ namespace VDeskTool
     	Console.WriteLine("                    /iv)? Returns 0 for visible and 1 for invisible.");
     	Console.WriteLine("/Switch[:<n>]    switch to desktop with number <n> or with number in pipeline");
     	Console.WriteLine("                   (short: /s).");
-    	Console.WriteLine("/Left            switch to virtual desktop to the left of the active desktop.");
-    	Console.WriteLine("/Right           switch to virtual desktop to the right of the active desktop.");
+    	Console.WriteLine("/Left            switch to virtual desktop to the left of the active desktop");
+    	Console.WriteLine("                   (short: /l).");
+    	Console.WriteLine("/Right           switch to virtual desktop to the right of the active desktop");
+    	Console.WriteLine("                   (short: /ri).");
     	Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
     	Console.WriteLine("/Remove[:<n>]    remove desktop number <n> or desktop with number in pipeline");
     	Console.WriteLine("                   (short: /r).");
@@ -1190,6 +1222,8 @@ namespace VDeskTool
     	Console.WriteLine("                   (short: /mw).");
     	Console.WriteLine("/MoveWindow:<n>  move process with id <n> to desktop with number in pipeline");
     	Console.WriteLine("                   (short: /mw).");
+    	Console.WriteLine("/MoveActiveWindow  move active window to desktop with number in pipeline");
+    	Console.WriteLine("                   (short: /maw).");
     	Console.WriteLine("/GetDesktopFromWindow:<s>  get desktop number where process with name <s> is");
     	Console.WriteLine("                   displayed (short: /gdfw).");
     	Console.WriteLine("/GetDesktopFromWindow:<n>  get desktop number where process with id <n> is");
@@ -1218,11 +1252,13 @@ namespace VDeskTool
     	Console.WriteLine("/IsApplicationPinned:<n>  check if application with process id <n> is pinned to");
     	Console.WriteLine("                   all desktops (short: /iap). Returns 0 for yes, 1 for no.");
     	Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
-    	Console.WriteLine("/Sleep[:<n>]     wait for <n> milliseconds.\n");
+    	Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
     	Console.WriteLine("Examples:\n");
     	Console.WriteLine("Virtualdesktop.exe -New -Switch -GetCurrentDesktop");
     	Console.WriteLine("Virtualdesktop.exe sleep:200 gd:1 mw:notepad s");
     	Console.WriteLine("Virtualdesktop.exe /Count /continue /Remove /Remove /Count");
+    	Console.WriteLine("VirtualDesktop.exe -IsWindowPinned:cmd");
+    	Console.WriteLine("if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd");
     }
 
   }

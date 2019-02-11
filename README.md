@@ -1,9 +1,9 @@
 # VirtualDesktop
 
-C# command line tool to manage virtual desktops in Windows 10<br><br> 
+C# command line tool to manage virtual desktops in Windows 10<br><br>
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5)
 
-**With Windows 10 1809 Microsoft changed the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1709.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat will generate all executables (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
+**With Windows 10 1809 Microsoft changed the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809 and newer, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1709.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat will generate all executables (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
 
 **Generate:**<br>
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
@@ -16,18 +16,19 @@ Virtual desktop numbers start with 0.
 **Parameters (leading / can be omitted or - can be used instead):**<br>
 /Help /h /?      this help screen.<br>
 /Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).<br>
-/Break /Continue break (default) or continue on error.<br>
+/Break /Continue break (default) or continue on error (short: /b and /co).<br>
 /Count           get count of virtual desktops to pipeline (short: /c).<br>
 /GetDesktop:(n)  get number of virtual desktop (n) to pipeline (short: /gd).<br>
 /GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).<br>
 /IsVisible[:(n)]  is desktop number (n) or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.<br>
 /Switch[:(n)]    switch to desktop with number (n) or with number in pipeline (short: /s).<br>
-/Left            switch to virtual desktop to the left of the active desktop.<br>
-/Right           switch to virtual desktop to the right of the active desktop.<br>
+/Left            switch to virtual desktop to the left of the active desktop (short: /l).<br>
+/Right           switch to virtual desktop to the right of the active desktop (short: /ri).<br>
 /New             create new desktop (short: /n). Number is stored in pipeline.<br>
 /Remove[:(n)]    remove desktop number (n) or desktop with number in pipeline (short: /r).<br>
 /MoveWindow:(s)  move process with name (s) to desktop with number in pipeline (short: /mw).<br>
 /MoveWindow:(n)  move process with id (n) to desktop with number in pipeline (short: /mw).<br>
+/MoveActiveWindow  move active window to desktop with number in pipeline (short: /maw).<br>
 /GetDesktopFromWindow:(s)  get desktop number where process with name (s) is displayed (short: /gdfw).<br>
 /GetDesktopFromWindow:(n)  get desktop number where process with id (n) is displayed (short: /gdfw).<br>
 /IsWindowOnDesktop:(s)  check if process with name (s) is on desktop with number in pipeline (short: /iwod). Returns 0 for yes, 1 for no.<br>
@@ -45,9 +46,11 @@ Virtual desktop numbers start with 0.
 /IsApplicationPinned:(s)  check if application with name (s) is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.<br>
 /IsApplicationPinned:(n)  check if application with process id (n) is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.<br>
 /WaitKey         wait for key press (short: /wk).<br>
-/Sleep[:(n)]     wait for (n) milliseconds.<br>
+/Sleep:(n)     wait for (n) milliseconds (short: /sl).<br>
 <br>
 **Examples:**<br>
 Virtualdesktop.exe -New -Switch -GetCurrentDesktop<br>
 Virtualdesktop.exe sleep:200 gd:1 mw:notepad s<br>
 Virtualdesktop.exe /Count /continue /Remove /Remove /Count<br>
+VirtualDesktop.exe -IsWindowPinned:cmd<br>
+if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd<br>
