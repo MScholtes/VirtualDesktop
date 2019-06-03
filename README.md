@@ -77,7 +77,7 @@ Virtual desktop numbers start with 0.
 
 **/IsApplicationPinned:(n)**  check if application with process id (n) is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.
 
-**/WaitKey**        wait for key press (short: /wk).
+**/WaitKey**       wait for key press (short: /wk).
 
 **/Sleep:(n)**     wait for (n) milliseconds (short: /sl).
 
