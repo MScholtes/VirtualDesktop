@@ -2,7 +2,7 @@
 // Version 1.4, 2019-06-02
 // Version for Windows 10 1607 to 1709 or Windows Server 2016
 // Compile with:
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1709.cs
+// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1607.cs
 
 using System;
 using System.Runtime.InteropServices;
