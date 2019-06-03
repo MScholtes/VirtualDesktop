@@ -2,6 +2,7 @@ Changes:
 
 Version 1.4, 2019-06-02
 - fixed errors in COM interface declaration for /PinApplication, /UnPinApplication and /IsApplicationPinned
+- renamed VirtualDesktop1709.cs to VirtualDesktop1607.cs
 
 Version 1.3, 2019-02-11
 - new parameter /MoveActiveWindow
