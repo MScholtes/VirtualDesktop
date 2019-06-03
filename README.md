@@ -11,7 +11,7 @@ Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
 
 ## Description:
 Command line tool to manage the virtual desktops of Windows 10.
-Parameters can be given as a sequence of commands. The result - most of thetimes the number of the processed desktop - can be used as input for the next parameter. The result of the last command is returned as error level.
+Parameters can be given as a sequence of commands. The result - most of the times the number of the processed desktop - can be used as input for the next parameter. The result of the last command is returned as error level.
 Virtual desktop numbers start with 0.
 
 ## Parameters (leading / can be omitted or - can be used instead):
@@ -77,7 +77,7 @@ Virtual desktop numbers start with 0.
 
 **/IsApplicationPinned:(n)**  check if application with process id (n) is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.
 
-**/WaitKey**         wait for key press (short: /wk).
+**/WaitKey**        wait for key press (short: /wk).
 
 **/Sleep:(n)**     wait for (n) milliseconds (short: /sl).
 
