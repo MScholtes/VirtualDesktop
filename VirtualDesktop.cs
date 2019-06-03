@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2019
-// Version 1.3
+// Version 1.4, 2019-06-02
 // Version for Windows 10 1809
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -53,7 +53,7 @@ namespace VirtualDesktop
 	}
 
 	[ComImport]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[InterfaceType(ComInterfaceType.InterfaceIsIInspectable)]
 	[Guid("372E1D3B-38D3-42E4-A15B-8AB2B178F513")]
 	internal interface IApplicationView
 	{
@@ -123,7 +123,8 @@ namespace VirtualDesktop
 		int GetViewForApplication(object application, out IApplicationView view);
 		int GetViewForAppUserModelId(string id, out IApplicationView view);
 		int GetViewInFocus(out IntPtr view);
-		void outreshCollection();
+		int Unknown1(out IntPtr view);
+		void RefreshCollection();
 		int RegisterForApplicationViewChanges(object listener, out int cookie);
 		int UnregisterForApplicationViewChanges(int cookie);
 	}
@@ -1201,7 +1202,7 @@ namespace VDeskTool
 
     static void HelpScreen()
     {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.13\n");
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4\n");
 
     	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
     	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
