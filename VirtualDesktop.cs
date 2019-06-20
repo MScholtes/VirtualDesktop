@@ -1174,12 +1174,12 @@ namespace VDeskTool
 
 				if (rc == -1)
 				{ // error in action, stop processing
-					Console.WriteLine("Error while processing '" + arg + "'");
+					Console.Error.WriteLine("Error while processing '" + arg + "'");
 					if (breakonerror) break;
 				}
 				if (rc == -2)
 				{ // error in parameter, stop processing
-					Console.WriteLine("Error in parameter '" + arg + "'");
+					Console.Error.WriteLine("Error in parameter '" + arg + "'");
 					if (breakonerror) break;
 				}
 			}
