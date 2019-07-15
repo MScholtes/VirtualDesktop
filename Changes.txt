@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.4.1, 2019-07-15
+- errors are written to the error stream (thanks to DennisKae)
+
 Version 1.4, 2019-06-02
 - fixed errors in COM interface declaration for /PinApplication, /UnPinApplication and /IsApplicationPinned
 - renamed VirtualDesktop1709.cs to VirtualDesktop1607.cs
