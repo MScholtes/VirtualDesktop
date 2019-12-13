@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2019
-// Version 1.4.1, 2019-07-15
+// Version 1.4.2, 2019-12-13
 // Version for Windows 10 1809
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -883,6 +883,29 @@ namespace VDeskTool
 									}
 								}
 								break;
+								
+							case "MOVEWINDOWHANDLE": // move window to desktop in rc
+							case "MWH":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ 
+											// use window handle and move window
+											VirtualDesktop.Desktop.FromIndex(rc).MoveWindow((IntPtr)iParam);
+											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " moved to desktop " + rc.ToString());
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " not found or move failed");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								break;
 
 							case "ISWINDOWPINNED": // is window pinned to all desktops
 							case "IWP":
@@ -1202,7 +1225,7 @@ namespace VDeskTool
 
     static void HelpScreen()
     {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4.1\n");
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4.2\n");
 
     	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
     	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
