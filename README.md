@@ -43,6 +43,8 @@ Virtual desktop numbers start with 0.
 
 **/MoveWindow:(n)**  move process with id (n) to desktop with number in pipeline (short: /mw).
 
+**/MoveWindowHandle:(n)**  move window with handle (n) to desktop with number in pipeline (short: /mwh).
+
 **/MoveActiveWindow**  move active window to desktop with number in pipeline (short: /maw).
 
 **/GetDesktopFromWindow:(s)**  get desktop number where process with name (s) is displayed (short: /gdfw).

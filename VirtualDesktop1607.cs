@@ -874,6 +874,29 @@ namespace VDeskTool
 									}
 								}
 								break;
+								
+							case "MOVEWINDOWHANDLE": // move window to desktop in rc
+							case "MWH":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ 
+											// use window handle and move window
+											VirtualDesktop.Desktop.FromIndex(rc).MoveWindow((IntPtr)iParam);
+											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " moved to desktop " + rc.ToString());
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " not found or move failed");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								break;
 
 							case "ISWINDOWPINNED": // is window pinned to all desktops
 							case "IWP":
