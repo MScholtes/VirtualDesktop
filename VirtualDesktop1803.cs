@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2019
-// Version 1.4.1, 2019-07-15
+// Version 1.4.2, 2019-12-13
 // Version for Windows 10 1803
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1803.cs
@@ -1218,7 +1218,7 @@ namespace VDeskTool
 
     static void HelpScreen()
     {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4.1\n");
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4.2\n");
 
     	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
     	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
