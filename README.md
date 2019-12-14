@@ -1,5 +1,5 @@
 # VirtualDesktop
-V1.4.1, 2019-07-15
+V1.4.2, 2019-12-13
 
 C# command line tool to manage virtual desktops in Windows 10<br><br>
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5)
@@ -42,6 +42,8 @@ Virtual desktop numbers start with 0.
 **/MoveWindow:(s)**  move process with name (s) to desktop with number in pipeline (short: /mw).
 
 **/MoveWindow:(n)**  move process with id (n) to desktop with number in pipeline (short: /mw).
+
+**/MoveWindowHandle:(n)**  move window with handle (n) to desktop with number in pipeline (short: /mwh).
 
 **/MoveActiveWindow**  move active window to desktop with number in pipeline (short: /maw).
 
