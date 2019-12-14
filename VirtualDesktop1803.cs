@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2019
-// Version 1.4.2, 2019-12-13
+// Version 1.4.2, 2019-12-14
 // Version for Windows 10 1803
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1803.cs
@@ -884,7 +884,7 @@ namespace VDeskTool
 									if (iParam > 0)
 									{ // check if parameter is greater than 0
 										try
-										{ 
+										{
 											// use window handle and move window
 											VirtualDesktop.Desktop.FromIndex(rc).MoveWindow((IntPtr)iParam);
 											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " moved to desktop " + rc.ToString());
@@ -1247,6 +1247,8 @@ namespace VDeskTool
     	Console.WriteLine("                   (short: /mw).");
     	Console.WriteLine("/MoveWindow:<n>  move process with id <n> to desktop with number in pipeline");
     	Console.WriteLine("                   (short: /mw).");
+    	Console.WriteLine("/MoveWindowHandle:<n>  move window with handle <n> to desktop with number in");
+    	Console.WriteLine("                   pipeline (short: /mwh).");
     	Console.WriteLine("/MoveActiveWindow  move active window to desktop with number in pipeline");
     	Console.WriteLine("                   (short: /maw).");
     	Console.WriteLine("/GetDesktopFromWindow:<s>  get desktop number where process with name <s> is");

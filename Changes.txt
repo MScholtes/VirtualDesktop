@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.4.2, 2019-12-14
+- merged new function MoveWindowHandle by Zoynels 
+
 Version 1.4.1, 2019-07-15
 - errors are written to the error stream (thanks to DennisKae)
 
