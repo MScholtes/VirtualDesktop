@@ -2,7 +2,7 @@
 V1.4.3, 2020-03-08
 
 C# command line tool to manage virtual desktops in Windows 10<br><br>
-(look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5)
+(look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
 **With Windows 10 1809 Microsoft changed the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809 and newer, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
 
