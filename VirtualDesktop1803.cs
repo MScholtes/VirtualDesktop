@@ -1,5 +1,5 @@
-// Author: Markus Scholtes, 2019
-// Version 1.4.2, 2019-12-14
+// Author: Markus Scholtes, 2020
+// Version 1.4.3, 2020-03-08
 // Version for Windows 10 1803
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1803.cs
@@ -7,6 +7,19 @@
 using System;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+
+// set attributes
+using System.Reflection;
+[assembly:AssemblyTitle("Command line tool to manage virtual desktops")]
+[assembly:AssemblyDescription("Command line tool to manage virtual desktops")]
+[assembly:AssemblyConfiguration("")]
+[assembly:AssemblyCompany("MS")]
+[assembly:AssemblyProduct("VirtualDesktop")]
+[assembly:AssemblyCopyright("© Markus Scholtes 2020")]
+[assembly:AssemblyTrademark("")]
+[assembly:AssemblyCulture("")]
+[assembly:AssemblyVersion("1.4.3.0")]
+[assembly:AssemblyFileVersion("1.4.3.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK and github project VirtualDesktop
 
@@ -382,7 +395,14 @@ namespace VirtualDesktop
 			{ // window of other process
 				IApplicationView view;
 				DesktopManager.ApplicationViewCollection.GetViewForHwnd(hWnd, out view);
-				DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view, ivd);
+				try {
+					DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view, ivd);
+				}
+				catch
+				{ // could not move active window, try main window (or whatever windows thinks is the main window)
+					DesktopManager.ApplicationViewCollection.GetViewForHwnd(System.Diagnostics.Process.GetProcessById(processId).MainWindowHandle, out view);
+					DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view, ivd);
+				}
 			}
 		}
 
@@ -1218,7 +1238,7 @@ namespace VDeskTool
 
     static void HelpScreen()
     {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4.2\n");
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.4.3\n");
 
     	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
     	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
@@ -1280,7 +1300,7 @@ namespace VDeskTool
     	Console.WriteLine("                   all desktops (short: /iap). Returns 0 for yes, 1 for no.");
     	Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
     	Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
-    	Console.WriteLine("Examples:\n");
+    	Console.WriteLine("Examples:");
     	Console.WriteLine("Virtualdesktop.exe -New -Switch -GetCurrentDesktop");
     	Console.WriteLine("Virtualdesktop.exe sleep:200 gd:1 mw:notepad s");
     	Console.WriteLine("Virtualdesktop.exe /Count /continue /Remove /Remove /Count");

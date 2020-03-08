@@ -1,5 +1,5 @@
-// Author: Markus Scholtes, 2019
-// Version 1.4.2, 2019-12-14
+// Author: Markus Scholtes, 2020
+// Version 1.4.3, 2020-03-08
 // Version for Windows 10 1809
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -7,6 +7,19 @@
 using System;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+
+// set attributes
+using System.Reflection;
+[assembly:AssemblyTitle("Command line tool to manage virtual desktops")]
+[assembly:AssemblyDescription("Command line tool to manage virtual desktops")]
+[assembly:AssemblyConfiguration("")]
+[assembly:AssemblyCompany("MS")]
+[assembly:AssemblyProduct("VirtualDesktop")]
+[assembly:AssemblyCopyright("© Markus Scholtes 2020")]
+[assembly:AssemblyTrademark("")]
+[assembly:AssemblyCulture("")]
+[assembly:AssemblyVersion("1.4.3.0")]
+[assembly:AssemblyFileVersion("1.4.3.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK and github project VirtualDesktop
 
@@ -325,7 +338,7 @@ namespace VirtualDesktop
 			}
 			else
 				// set fallback desktop
-			  fallbackdesktop = fallback.ivd;
+				fallbackdesktop = fallback.ivd;
 
 			DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(ivd, fallbackdesktop);
 		}
@@ -389,7 +402,14 @@ namespace VirtualDesktop
 			{ // window of other process
 				IApplicationView view;
 				DesktopManager.ApplicationViewCollection.GetViewForHwnd(hWnd, out view);
-				DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view, ivd);
+				try {
+					DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view, ivd);
+				}
+				catch
+				{ // could not move active window, try main window (or whatever windows thinks is the main window)
+					DesktopManager.ApplicationViewCollection.GetViewForHwnd(System.Diagnostics.Process.GetProcessById(processId).MainWindowHandle, out view);
+					DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view, ivd);
+				}
 			}
 		}
 
@@ -470,23 +490,23 @@ namespace VirtualDesktop
 
 namespace VDeskTool
 {
-  static class Program
-  {
-  	static bool verbose = true;
-  	static bool breakonerror = true;
-  	static int rc = 0;
+	static class Program
+	{
+		static bool verbose = true;
+		static bool breakonerror = true;
+		static int rc = 0;
 
-    static int Main(string[] args)
-    {
-      if (args.Length == 0)
-      { // no arguments, show help screen
-      	HelpScreen();
-      	return -2;
-      }
+		static int Main(string[] args)
+		{
+			if (args.Length == 0)
+			{ // no arguments, show help screen
+				HelpScreen();
+				return -2;
+			}
 
 			foreach (string arg in args)
 			{
-     		System.Text.RegularExpressions.GroupCollection groups = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?([^:=]*)$").Groups;
+				System.Text.RegularExpressions.GroupCollection groups = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?([^:=]*)$").Groups;
 
 				if (groups.Count != 3)
 				{ // parameter error
@@ -1207,8 +1227,8 @@ namespace VDeskTool
 				}
 			}
 
-    	return rc;
-    }
+			return rc;
+		}
 
 		static int GetWindowHandle(string ProcessName)
 		{ // retrieve window handle to process name
@@ -1223,77 +1243,77 @@ namespace VDeskTool
 			return wHwnd;
 		}
 
-    static void HelpScreen()
-    {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2019, v1.4.2\n");
+		static void HelpScreen()
+		{
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.4.3\n");
 
-    	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
-    	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
-    	Console.WriteLine("times the number of the processed desktop - can be used as input for the next");
-    	Console.WriteLine("parameter. The result of the last command is returned as error level.");
-    	Console.WriteLine("Virtual desktop numbers start with 0.\n");
-    	Console.WriteLine("Parameters (leading / can be omitted or - can be used instead):\n");
-    	Console.WriteLine("/Help /h /?      this help screen.");
-    	Console.WriteLine("/Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).");
-    	Console.WriteLine("/Break /Continue break (default) or continue on error (short: /b and /co).");
-    	Console.WriteLine("/Count           get count of virtual desktops to pipeline (short: /c).");
-    	Console.WriteLine("/GetDesktop:<n>  get number of virtual desktop <n> to pipeline (short: /gd).");
-    	Console.WriteLine("/GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).");
-    	Console.WriteLine("/IsVisible[:<n>]  is desktop number <n> or number in pipeline visible (short:");
-    	Console.WriteLine("                    /iv)? Returns 0 for visible and 1 for invisible.");
-    	Console.WriteLine("/Switch[:<n>]    switch to desktop with number <n> or with number in pipeline");
-    	Console.WriteLine("                   (short: /s).");
-    	Console.WriteLine("/Left            switch to virtual desktop to the left of the active desktop");
-    	Console.WriteLine("                   (short: /l).");
-    	Console.WriteLine("/Right           switch to virtual desktop to the right of the active desktop");
-    	Console.WriteLine("                   (short: /ri).");
-    	Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
-    	Console.WriteLine("/Remove[:<n>]    remove desktop number <n> or desktop with number in pipeline");
-    	Console.WriteLine("                   (short: /r).");
-    	Console.WriteLine("/MoveWindow:<s>  move process with name <s> to desktop with number in pipeline");
-    	Console.WriteLine("                   (short: /mw).");
-    	Console.WriteLine("/MoveWindow:<n>  move process with id <n> to desktop with number in pipeline");
-    	Console.WriteLine("                   (short: /mw).");
-    	Console.WriteLine("/MoveWindowHandle:<n>  move window with handle <n> to desktop with number in");
-    	Console.WriteLine("                   pipeline (short: /mwh).");
-    	Console.WriteLine("/MoveActiveWindow  move active window to desktop with number in pipeline");
-    	Console.WriteLine("                   (short: /maw).");
-    	Console.WriteLine("/GetDesktopFromWindow:<s>  get desktop number where process with name <s> is");
-    	Console.WriteLine("                   displayed (short: /gdfw).");
-    	Console.WriteLine("/GetDesktopFromWindow:<n>  get desktop number where process with id <n> is");
-    	Console.WriteLine("                   displayed (short: /gdfw).");
-    	Console.WriteLine("/IsWindowOnDesktop:<s>  check if process with name <s> is on desktop with num-");
-    	Console.WriteLine("                   ber in pipeline (short: /iwod). Returns 0 for yes, 1 for no.");
-    	Console.WriteLine("/IsWindowOnDesktop:<n>  check if process with id <n> is on desktop with number");
-    	Console.WriteLine("                   in pipeline (short: /iwod). Returns 0 for yes, 1 for no.");
-    	Console.WriteLine("/PinWindow:<s>   pin process with name <s> to all desktops (short: /pw).");
-    	Console.WriteLine("/PinWindow:<n>   pin process with id <n> to all desktops (short: /pw).");
-    	Console.WriteLine("/UnPinWindow:<s>  unpin process with name <s> from all desktops (short: /upw).");
-    	Console.WriteLine("/UnPinWindow:<n>  unpin process with id <n> from all desktops (short: /upw).");
-    	Console.WriteLine("/IsWindowPinned:<s>  check if process with name <s> is pinned to all desktops");
-    	Console.WriteLine("                   (short: /iwp). Returns 0 for yes, 1 for no.");
-    	Console.WriteLine("/IsWindowPinned:<n>  check if process with id <n> is pinned to all desktops");
-    	Console.WriteLine("                   (short: /iwp). Returns 0 for yes, 1 for no.");
-    	Console.WriteLine("/PinApplication:<s>  pin application with name <s> to all desktops (short: /pa)");
-    	Console.WriteLine("/PinApplication:<n>  pin application with process id <n> to all desktops");
-    	Console.WriteLine("                   (short: /pa).");
-    	Console.WriteLine("/UnPinApplication:<s>  unpin application with name <s> from all desktops");
-    	Console.WriteLine("                   (short: /upa).");
-    	Console.WriteLine("/UnPinApplication:<n>  unpin application with process id <n> from all desktops");
-    	Console.WriteLine("                   (short: /upa).");
-    	Console.WriteLine("/IsApplicationPinned:<s>  check if application with name <s> is pinned to all");
-    	Console.WriteLine("                   desktops (short: /iap). Returns 0 for yes, 1 for no.");
-    	Console.WriteLine("/IsApplicationPinned:<n>  check if application with process id <n> is pinned to");
-    	Console.WriteLine("                   all desktops (short: /iap). Returns 0 for yes, 1 for no.");
-    	Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
-    	Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
-    	Console.WriteLine("Examples:\n");
-    	Console.WriteLine("Virtualdesktop.exe -New -Switch -GetCurrentDesktop");
-    	Console.WriteLine("Virtualdesktop.exe sleep:200 gd:1 mw:notepad s");
-    	Console.WriteLine("Virtualdesktop.exe /Count /continue /Remove /Remove /Count");
-    	Console.WriteLine("VirtualDesktop.exe -IsWindowPinned:cmd");
-    	Console.WriteLine("if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd");
-    }
+			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
+			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
+			Console.WriteLine("times the number of the processed desktop - can be used as input for the next");
+			Console.WriteLine("parameter. The result of the last command is returned as error level.");
+			Console.WriteLine("Virtual desktop numbers start with 0.\n");
+			Console.WriteLine("Parameters (leading / can be omitted or - can be used instead):\n");
+			Console.WriteLine("/Help /h /?      this help screen.");
+			Console.WriteLine("/Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).");
+			Console.WriteLine("/Break /Continue break (default) or continue on error (short: /b and /co).");
+			Console.WriteLine("/Count           get count of virtual desktops to pipeline (short: /c).");
+			Console.WriteLine("/GetDesktop:<n>  get number of virtual desktop <n> to pipeline (short: /gd).");
+			Console.WriteLine("/GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).");
+			Console.WriteLine("/IsVisible[:<n>]  is desktop number <n> or number in pipeline visible (short:");
+			Console.WriteLine("                    /iv)? Returns 0 for visible and 1 for invisible.");
+			Console.WriteLine("/Switch[:<n>]    switch to desktop with number <n> or with number in pipeline");
+			Console.WriteLine("                   (short: /s).");
+			Console.WriteLine("/Left            switch to virtual desktop to the left of the active desktop");
+			Console.WriteLine("                   (short: /l).");
+			Console.WriteLine("/Right           switch to virtual desktop to the right of the active desktop");
+			Console.WriteLine("                   (short: /ri).");
+			Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
+			Console.WriteLine("/Remove[:<n>]    remove desktop number <n> or desktop with number in pipeline");
+			Console.WriteLine("                   (short: /r).");
+			Console.WriteLine("/MoveWindow:<s>  move process with name <s> to desktop with number in pipeline");
+			Console.WriteLine("                   (short: /mw).");
+			Console.WriteLine("/MoveWindow:<n>  move process with id <n> to desktop with number in pipeline");
+			Console.WriteLine("                   (short: /mw).");
+			Console.WriteLine("/MoveWindowHandle:<n>  move window with handle <n> to desktop with number in");
+			Console.WriteLine("                   pipeline (short: /mwh).");
+			Console.WriteLine("/MoveActiveWindow  move active window to desktop with number in pipeline");
+			Console.WriteLine("                   (short: /maw).");
+			Console.WriteLine("/GetDesktopFromWindow:<s>  get desktop number where process with name <s> is");
+			Console.WriteLine("                   displayed (short: /gdfw).");
+			Console.WriteLine("/GetDesktopFromWindow:<n>  get desktop number where process with id <n> is");
+			Console.WriteLine("                   displayed (short: /gdfw).");
+			Console.WriteLine("/IsWindowOnDesktop:<s>  check if process with name <s> is on desktop with num-");
+			Console.WriteLine("                   ber in pipeline (short: /iwod). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/IsWindowOnDesktop:<n>  check if process with id <n> is on desktop with number");
+			Console.WriteLine("                   in pipeline (short: /iwod). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/PinWindow:<s>   pin process with name <s> to all desktops (short: /pw).");
+			Console.WriteLine("/PinWindow:<n>   pin process with id <n> to all desktops (short: /pw).");
+			Console.WriteLine("/UnPinWindow:<s>  unpin process with name <s> from all desktops (short: /upw).");
+			Console.WriteLine("/UnPinWindow:<n>  unpin process with id <n> from all desktops (short: /upw).");
+			Console.WriteLine("/IsWindowPinned:<s>  check if process with name <s> is pinned to all desktops");
+			Console.WriteLine("                   (short: /iwp). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/IsWindowPinned:<n>  check if process with id <n> is pinned to all desktops");
+			Console.WriteLine("                   (short: /iwp). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/PinApplication:<s>  pin application with name <s> to all desktops (short: /pa)");
+			Console.WriteLine("/PinApplication:<n>  pin application with process id <n> to all desktops");
+			Console.WriteLine("                   (short: /pa).");
+			Console.WriteLine("/UnPinApplication:<s>  unpin application with name <s> from all desktops");
+			Console.WriteLine("                   (short: /upa).");
+			Console.WriteLine("/UnPinApplication:<n>  unpin application with process id <n> from all desktops");
+			Console.WriteLine("                   (short: /upa).");
+			Console.WriteLine("/IsApplicationPinned:<s>  check if application with name <s> is pinned to all");
+			Console.WriteLine("                   desktops (short: /iap). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/IsApplicationPinned:<n>  check if application with process id <n> is pinned to");
+			Console.WriteLine("                   all desktops (short: /iap). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
+			Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
+			Console.WriteLine("Examples:");
+			Console.WriteLine("Virtualdesktop.exe -New -Switch -GetCurrentDesktop");
+			Console.WriteLine("Virtualdesktop.exe sleep:200 gd:1 mw:notepad s");
+			Console.WriteLine("Virtualdesktop.exe /Count /continue /Remove /Remove /Count");
+			Console.WriteLine("VirtualDesktop.exe -IsWindowPinned:cmd");
+			Console.WriteLine("if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd");
+		}
 
-  }
+	}
 }

@@ -1,5 +1,9 @@
 Changes:
 
+Version 1.4.3, 2020-03-08
+- MoveWindow tries to move MainWindow if actual window is not movable
+- added meta data and icon to executables
+
 Version 1.4.2, 2019-12-14
 - merged new function MoveWindowHandle by Zoynels 
 

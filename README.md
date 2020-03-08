@@ -1,5 +1,5 @@
 # VirtualDesktop
-V1.4.2, 2019-12-14
+V1.4.3, 2020-03-08
 
 C# command line tool to manage virtual desktops in Windows 10<br><br>
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5)
