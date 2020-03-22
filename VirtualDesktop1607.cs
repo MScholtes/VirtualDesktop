@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2020
-// Version 1.4.3, 2020-03-08
+// Version 1.4.4, 2020-03-22
 // Version for Windows 10 1607 to 1709 or Windows Server 2016
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1607.cs
@@ -18,8 +18,8 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2020")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.4.3.0")]
-[assembly:AssemblyFileVersion("1.4.3.0")]
+[assembly:AssemblyVersion("1.4.4.0")]
+[assembly:AssemblyFileVersion("1.4.4.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK and github project VirtualDesktop
 
@@ -485,6 +485,7 @@ namespace VDeskTool
   {
   	static bool verbose = true;
   	static bool breakonerror = true;
+  	static bool wrapdesktops = false;
   	static int rc = 0;
 
     static int Main(string[] args)
@@ -540,6 +541,18 @@ namespace VDeskTool
 								breakonerror = false;
 								break;
 
+							case "WRAP": // wrap desktops using "LEFT" or "RIGHT"
+							case "W":
+								if (verbose) Console.WriteLine("Wrapping desktops enabled");
+								wrapdesktops = true;
+								break;
+
+							case "NOWRAP": // do not wrap desktops
+							case "NW":
+								if (verbose) Console.WriteLine("Wrapping desktop disabled");
+								wrapdesktops = false;
+								break;
+
 							case "COUNT": // get count of desktops
 							case "C":
 								rc = VirtualDesktop.Desktop.Count;
@@ -589,7 +602,10 @@ namespace VDeskTool
 								if (verbose) Console.Write("Switching to left virtual desktop");
 								try
 								{ // activate virtual desktop to the left
-									VirtualDesktop.Desktop.Current.Left.MakeVisible();
+									if (wrapdesktops && (VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current) == 0))
+										VirtualDesktop.Desktop.FromIndex(VirtualDesktop.Desktop.Count - 1).MakeVisible();
+									else
+										VirtualDesktop.Desktop.Current.Left.MakeVisible();
 									rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
 									if (verbose) Console.WriteLine(", desktop " + rc.ToString() + " is active now");
 								}
@@ -605,7 +621,10 @@ namespace VDeskTool
 								if (verbose) Console.Write("Switching to right virtual desktop");
 								try
 								{ // activate virtual desktop to the right
-									VirtualDesktop.Desktop.Current.Right.MakeVisible();
+									if (wrapdesktops && (VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current) == VirtualDesktop.Desktop.Count - 1))
+										VirtualDesktop.Desktop.FromIndex(0).MakeVisible();
+									else
+										VirtualDesktop.Desktop.Current.Right.MakeVisible();
 									rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
 									if (verbose) Console.WriteLine(", desktop " + rc.ToString() + " is active now");
 								}
@@ -1236,7 +1255,7 @@ namespace VDeskTool
 
     static void HelpScreen()
     {
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.4.3\n");
+    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.4.4\n");
 
     	Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
     	Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
@@ -1258,6 +1277,8 @@ namespace VDeskTool
     	Console.WriteLine("                   (short: /l).");
     	Console.WriteLine("/Right           switch to virtual desktop to the right of the active desktop");
     	Console.WriteLine("                   (short: /ri).");
+    	Console.WriteLine("/Wrap /NoWrap    /Left or /Right switch over or generate an error when the edge");
+    	Console.WriteLine("                   is reached (default)(short /w and /nw).");
     	Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
     	Console.WriteLine("/Remove[:<n>]    remove desktop number <n> or desktop with number in pipeline");
     	Console.WriteLine("                   (short: /r).");

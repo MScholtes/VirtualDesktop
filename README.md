@@ -1,5 +1,5 @@
 # VirtualDesktop
-V1.4.3, 2020-03-08
+V1.4.4, 2020-03-22
 
 C# command line tool to manage virtual desktops in Windows 10<br><br>
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
@@ -35,6 +35,8 @@ Virtual desktop numbers start with 0.
 
 **/Right**           switch to virtual desktop to the right of the active desktop (short: /ri).
 
+**/Wrap /NoWrap**    /Left or /Right switch over or generate an error when the edge is reached (default)(short /w and /nw).
+ 
 **/New**             create new desktop (short: /n). Number is stored in pipeline.
 
 **/Remove[:(n)]**    remove desktop number (n) or desktop with number in pipeline (short: /r).

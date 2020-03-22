@@ -1,5 +1,9 @@
 Changes:
 
+Version 1.4.4, 2020-03-22
+- new parameters /Wrap and /NoWrap
+- /Left and /right switch over the edge when /Warp is supplied
+
 Version 1.4.3, 2020-03-08
 - MoveWindow tries to move MainWindow if actual window is not movable
 - added meta data and icon to executables
