@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2020
-// Version 1.4.4, 2020-03-22
+// Version 1.5, 2020-05-24
 // Version for Windows 10 1809
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -7,6 +7,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Text;
 
 // set attributes
 using System.Reflection;
@@ -18,8 +19,8 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2020")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.4.4.0")]
-[assembly:AssemblyFileVersion("1.4.4.0")]
+[assembly:AssemblyVersion("1.5.0.0")]
+[assembly:AssemblyFileVersion("1.5.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK and github project VirtualDesktop
 
@@ -494,7 +495,7 @@ namespace VDeskTool
 	{
 		static bool verbose = true;
 		static bool breakonerror = true;
-  	static bool wrapdesktops = false;
+		static bool wrapdesktops = false;
 		static int rc = 0;
 
 		static int Main(string[] args)
@@ -818,13 +819,50 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking desktop for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.FromWindow((IntPtr)iParam));
 										if (verbose) Console.WriteLine("Window of process '" + groups[2].Value + "' is on desktop " + rc.ToString());
 									}
 									catch
 									{ // error while seeking
 										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found");
+										rc = -1;
+									}
+								}
+								break;
+
+							case "GETDESKTOPFROMWINDOWHANDLE": // get desktop from window handle
+							case "GDFWH":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ // seeking desktop for window handle
+											rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.FromWindow((IntPtr)iParam));
+											if (verbose) Console.WriteLine("Window is on desktop " + rc.ToString());
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + "' not found");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								else
+								{
+									try
+									{ // seeking window with window title
+										iParam = (Int32)GetWindowFromTitle(groups[2].Value.Trim().Replace("^", ""));
+										// seeking desktop for window handle
+										rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.FromWindow((IntPtr)iParam));
+										if (verbose) Console.WriteLine("Window '" + foundTitle + "' is on desktop " + rc.ToString());
+									}
+									catch
+									{ // error while seeking
+										if (verbose) Console.WriteLine("Window with text '" + groups[2].Value + "' in title not found");
 										rc = -1;
 									}
 								}
@@ -864,7 +902,7 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking desktop for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										if (VirtualDesktop.Desktop.FromIndex(rc).HasWindow((IntPtr)iParam))
 										{
 											if (verbose) Console.WriteLine("Window of process '" + groups[2].Value + "' is on desktop " + rc.ToString());
@@ -879,6 +917,59 @@ namespace VDeskTool
 									catch
 									{ // error while seeking
 										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found");
+										rc = -1;
+									}
+								}
+								break;
+
+							case "ISWINDOWHANDLEONDESKTOP": // is window with handle on desktop in rc
+							case "IWHOD":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ // checking desktop for window handle
+											if (VirtualDesktop.Desktop.FromIndex(rc).HasWindow((IntPtr)iParam))
+											{
+												if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " is on desktop " + rc.ToString());
+												rc = 0;
+											}
+											else
+											{
+												if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " is not on desktop " + rc.ToString());
+												rc = 1;
+											}
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " not found");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								else
+								{
+									try
+									{ // seeking window with window title
+										iParam = (Int32)GetWindowFromTitle(groups[2].Value.Trim().Replace("^", ""));
+									  // checking desktop for window handle
+										if (VirtualDesktop.Desktop.FromIndex(rc).HasWindow((IntPtr)iParam))
+										{
+											if (verbose) Console.WriteLine("Window '" + foundTitle + "' is on desktop " + rc.ToString());
+											rc = 0;
+										}
+										else
+										{
+											if (verbose) Console.WriteLine("Window '" + foundTitle + "' is not on desktop " + rc.ToString());
+											rc = 1;
+										}
+									}
+									catch
+									{ // error while seeking
+										if (verbose) Console.WriteLine("Window with text '" + groups[2].Value + "' in title not found");
 										rc = -1;
 									}
 								}
@@ -910,7 +1001,7 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking window for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										// move window
 										VirtualDesktop.Desktop.FromIndex(rc).MoveWindow((IntPtr)iParam);
 										if (verbose) Console.WriteLine("Window of process '" + groups[2].Value + "' moved to desktop " + rc.ToString());
@@ -923,7 +1014,7 @@ namespace VDeskTool
 								}
 								break;
 
-							case "MOVEWINDOWHANDLE": // move window to desktop in rc
+							case "MOVEWINDOWHANDLE": // move window with handle to desktop in rc
 							case "MWH":
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // check if parameter is an integer
@@ -933,16 +1024,31 @@ namespace VDeskTool
 										{
 											// use window handle and move window
 											VirtualDesktop.Desktop.FromIndex(rc).MoveWindow((IntPtr)iParam);
-											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " moved to desktop " + rc.ToString());
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " moved to desktop " + rc.ToString());
 										}
 										catch
 										{ // error while seeking
-											if (verbose) Console.WriteLine("Window to handle id " + groups[2].Value + " not found or move failed");
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " not found or move failed");
 											rc = -1;
 										}
 									}
 									else
 										rc = -1;
+								}
+								else
+								{
+									try
+									{ // seeking window with window title
+										iParam = (Int32)GetWindowFromTitle(groups[2].Value.Trim().Replace("^", ""));
+										// move window
+										VirtualDesktop.Desktop.FromIndex(rc).MoveWindow((IntPtr)iParam);
+										if (verbose) Console.WriteLine("Window '" + foundTitle + "' moved to desktop " + rc.ToString());
+									}
+									catch
+									{ // error while seeking
+										if (verbose) Console.WriteLine("Window with text '" + groups[2].Value + "' in title not found or move failed");
+										rc = -1;
+									}
 								}
 								break;
 
@@ -980,7 +1086,7 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking desktop for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										if (VirtualDesktop.Desktop.IsWindowPinned((IntPtr)iParam))
 										{
 											if (verbose) Console.WriteLine("Window of process '" + groups[2].Value + "' is pinned to all desktops");
@@ -995,6 +1101,58 @@ namespace VDeskTool
 									catch
 									{ // error while seeking
 										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found");
+										rc = -1;
+									}
+								}
+								break;
+
+							case "ISWINDOWHANDLEPINNED": // is window with handle pinned to all desktops
+							case "IWHP":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ // checking desktop for window handle
+											if (VirtualDesktop.Desktop.IsWindowPinned((IntPtr)iParam))
+											{
+												if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " is pinned to all desktops");
+												rc = 0;
+											}
+											else
+											{
+												if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " is not pinned to all desktops");
+												rc = 1;
+											}
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " not found");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								else
+								{
+									try
+									{ // seeking window with window title
+										iParam = (Int32)GetWindowFromTitle(groups[2].Value.Trim().Replace("^", ""));
+										if (VirtualDesktop.Desktop.IsWindowPinned((IntPtr)iParam))
+										{
+											if (verbose) Console.WriteLine("Window '" + foundTitle + "' is pinned to all desktops");
+											rc = 0;
+										}
+										else
+										{
+											if (verbose) Console.WriteLine("Window '" + foundTitle + "' is not pinned to all desktops");
+											rc = 1;
+										}
+									}
+									catch
+									{ // error while seeking
+										if (verbose) Console.WriteLine("Window with text '" + groups[2].Value + "' in title not found");
 										rc = -1;
 									}
 								}
@@ -1026,7 +1184,7 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking window for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										// pin window
 										VirtualDesktop.Desktop.PinWindow((IntPtr)iParam);
 										if (verbose) Console.WriteLine("Window of process '" + groups[2].Value + "' pinned to all desktops");
@@ -1034,6 +1192,43 @@ namespace VDeskTool
 									catch
 									{ // error while seeking
 										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found or pin failed");
+										rc = -1;
+									}
+								}
+								break;
+
+							case "PINWINDOWHANDLE": // pin window with handle to all desktops
+							case "PWH":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ // process window handle and pin window
+											VirtualDesktop.Desktop.PinWindow((IntPtr)iParam);
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " pinned to all desktops");
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " not found or pin failed");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								else
+								{
+									try
+									{ // seeking window with window title
+										iParam = (Int32)GetWindowFromTitle(groups[2].Value.Trim().Replace("^", ""));
+										// pin window
+										VirtualDesktop.Desktop.PinWindow((IntPtr)iParam);
+										if (verbose) Console.WriteLine("Window '" + foundTitle + "' pinned to all desktops");
+									}
+									catch
+									{ // error while seeking
+										if (verbose) Console.WriteLine("Window with text '" + groups[2].Value + "' in title not found or pin failed");
 										rc = -1;
 									}
 								}
@@ -1054,7 +1249,7 @@ namespace VDeskTool
 										}
 										catch
 										{ // error while seeking
-											if (verbose) Console.WriteLine("Window to process id " + groups[2].Value + " not found or pin failed");
+											if (verbose) Console.WriteLine("Window to process id " + groups[2].Value + " not found or unpin failed");
 											rc = -1;
 										}
 									}
@@ -1065,14 +1260,51 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking window for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
-										// pin window
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
+										// unpin window
 										VirtualDesktop.Desktop.UnpinWindow((IntPtr)iParam);
 										if (verbose) Console.WriteLine("Window of process '" + groups[2].Value + "' unpinned from all desktops");
 									}
 									catch
 									{ // error while seeking
-										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found or pin failed");
+										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found or unpin failed");
+										rc = -1;
+									}
+								}
+								break;
+
+							case "UNPINWINDOWHANDLE": // unpin window with handle from all desktops
+							case "UPWH":
+								if (int.TryParse(groups[2].Value, out iParam))
+								{ // check if parameter is an integer
+									if (iParam > 0)
+									{ // check if parameter is greater than 0
+										try
+										{ // process window handle and unpin window
+											VirtualDesktop.Desktop.UnpinWindow((IntPtr)iParam);
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " unpinned from all desktops");
+										}
+										catch
+										{ // error while seeking
+											if (verbose) Console.WriteLine("Window to handle " + groups[2].Value + " not found or unpin failed");
+											rc = -1;
+										}
+									}
+									else
+										rc = -1;
+								}
+								else
+								{
+									try
+									{ // seeking window with window title
+										iParam = (Int32)GetWindowFromTitle(groups[2].Value.Trim().Replace("^", ""));
+										// unpin window
+										VirtualDesktop.Desktop.UnpinWindow((IntPtr)iParam);
+										if (verbose) Console.WriteLine("Window '" + foundTitle + "' unpinned from all desktops");
+									}
+									catch
+									{ // error while seeking
+										if (verbose) Console.WriteLine("Window with text '" + groups[2].Value + "' in title not found or unpin failed");
 										rc = -1;
 									}
 								}
@@ -1112,7 +1344,7 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking desktop for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										if (VirtualDesktop.Desktop.IsApplicationPinned((IntPtr)iParam))
 										{
 											if (verbose) Console.WriteLine("Application of process '" + groups[2].Value + "' is pinned to all desktops");
@@ -1158,7 +1390,7 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking window for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
 										// pin window
 										VirtualDesktop.Desktop.PinApplication((IntPtr)iParam);
 										if (verbose) Console.WriteLine("Application of process '" + groups[2].Value + "' pinned to all desktops");
@@ -1186,7 +1418,7 @@ namespace VDeskTool
 										}
 										catch
 										{ // error while seeking
-											if (verbose) Console.WriteLine("Window to process id " + groups[2].Value + " not found or pin failed");
+											if (verbose) Console.WriteLine("Window to process id " + groups[2].Value + " not found or unpin failed");
 											rc = -1;
 										}
 									}
@@ -1197,14 +1429,14 @@ namespace VDeskTool
 								{
 									try
 									{ // seeking window for process name
-										iParam = GetWindowHandle(groups[2].Value.Trim());
-										// pin window
+										iParam = GetMainWindowHandle(groups[2].Value.Trim());
+										// unpin window
 										VirtualDesktop.Desktop.UnpinApplication((IntPtr)iParam);
 										if (verbose) Console.WriteLine("Application of process '" + groups[2].Value + "' unpinned from all desktops");
 									}
 									catch
 									{ // error while seeking
-										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found or pin failed");
+										if (verbose) Console.WriteLine("Process '" + groups[2].Value + "' not found or unpin failed");
 										rc = -1;
 									}
 								}
@@ -1249,8 +1481,8 @@ namespace VDeskTool
 			return rc;
 		}
 
-		static int GetWindowHandle(string ProcessName)
-		{ // retrieve window handle to process name
+		static int GetMainWindowHandle(string ProcessName)
+		{ // retrieve main window handle to process name
 			System.Diagnostics.Process[] processes = System.Diagnostics.Process.GetProcessesByName(ProcessName);
 			int wHwnd = 0;
 
@@ -1262,9 +1494,66 @@ namespace VDeskTool
 			return wHwnd;
 		}
 
+		const int MAXTITLE = 255;
+
+		private static IntPtr foundHandle;
+		private static string foundTitle;
+		private static string searchTitle;
+
+		private delegate bool EnumDelegate(IntPtr hWnd, int lParam);
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool IsWindowVisible(IntPtr hWnd);
+
+		[DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
+		private static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumDelegate lpEnumCallbackFunction, IntPtr lParam);
+
+		[DllImport("user32.dll", CharSet=CharSet.Auto, SetLastError=true)]
+		private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpWindowText, int nMaxCount);
+
+		private static bool EnumWindowsProc(IntPtr hWnd, int lParam)
+		{
+			StringBuilder windowText = new StringBuilder(MAXTITLE);
+			int titleLength = GetWindowText(hWnd, windowText, windowText.Capacity + 1);
+			windowText.Length = titleLength;
+			string title = windowText.ToString();
+
+			if (!string.IsNullOrEmpty(title) && IsWindowVisible(hWnd))
+			{
+				if (title.ToUpper().IndexOf(searchTitle.ToUpper()) >= 0)
+				{
+					foundHandle = hWnd;
+					foundTitle = title;
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private static IntPtr GetWindowFromTitle(string searchFor)
+		{
+			searchTitle = searchFor;
+			EnumDelegate enumfunc = new EnumDelegate(EnumWindowsProc);
+
+			foundHandle = IntPtr.Zero;
+			foundTitle = "";
+			EnumDesktopWindows(IntPtr.Zero, enumfunc, IntPtr.Zero);
+			if (foundHandle == IntPtr.Zero)
+			{
+				// Get the last Win32 error code
+				int errorCode = Marshal.GetLastWin32Error();
+				if (errorCode != 0)
+				{ // error
+					Console.WriteLine("EnumDesktopWindows failed with code {0}.", errorCode);
+				}
+			}
+			return foundHandle;
+		}
+
 		static void HelpScreen()
 		{
-    	Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.4.4\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.5\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
@@ -1286,54 +1575,59 @@ namespace VDeskTool
 			Console.WriteLine("                   (short: /l).");
 			Console.WriteLine("/Right           switch to virtual desktop to the right of the active desktop");
 			Console.WriteLine("                   (short: /ri).");
-    	Console.WriteLine("/Wrap /NoWrap    /Left or /Right switch over or generate an error when the edge");
-    	Console.WriteLine("                   is reached (default)(short /w and /nw).");
+			Console.WriteLine("/Wrap /NoWrap    /Left or /Right switch over or generate an error when the edge");
+			Console.WriteLine("                   is reached (default)(short /w and /nw).");
 			Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
 			Console.WriteLine("/Remove[:<n>]    remove desktop number <n> or desktop with number in pipeline");
 			Console.WriteLine("                   (short: /r).");
-			Console.WriteLine("/MoveWindow:<s>  move process with name <s> to desktop with number in pipeline");
-			Console.WriteLine("                   (short: /mw).");
-			Console.WriteLine("/MoveWindow:<n>  move process with id <n> to desktop with number in pipeline");
-			Console.WriteLine("                   (short: /mw).");
-			Console.WriteLine("/MoveWindowHandle:<n>  move window with handle <n> to desktop with number in");
-			Console.WriteLine("                   pipeline (short: /mwh).");
+			Console.WriteLine("/MoveWindow:<s|n>  move process with name <s> or id <n> to desktop with number");
+			Console.WriteLine("                   in pipeline (short: /mw).");
+			Console.WriteLine("/MoveWindowHandle:<s|n>  move window with text <s> in title or handle <n> to");
+			Console.WriteLine("                   desktop with number in pipeline (short: /mwh).");
 			Console.WriteLine("/MoveActiveWindow  move active window to desktop with number in pipeline");
 			Console.WriteLine("                   (short: /maw).");
-			Console.WriteLine("/GetDesktopFromWindow:<s>  get desktop number where process with name <s> is");
-			Console.WriteLine("                   displayed (short: /gdfw).");
-			Console.WriteLine("/GetDesktopFromWindow:<n>  get desktop number where process with id <n> is");
-			Console.WriteLine("                   displayed (short: /gdfw).");
-			Console.WriteLine("/IsWindowOnDesktop:<s>  check if process with name <s> is on desktop with num-");
-			Console.WriteLine("                   ber in pipeline (short: /iwod). Returns 0 for yes, 1 for no.");
-			Console.WriteLine("/IsWindowOnDesktop:<n>  check if process with id <n> is on desktop with number");
-			Console.WriteLine("                   in pipeline (short: /iwod). Returns 0 for yes, 1 for no.");
-			Console.WriteLine("/PinWindow:<s>   pin process with name <s> to all desktops (short: /pw).");
-			Console.WriteLine("/PinWindow:<n>   pin process with id <n> to all desktops (short: /pw).");
-			Console.WriteLine("/UnPinWindow:<s>  unpin process with name <s> from all desktops (short: /upw).");
-			Console.WriteLine("/UnPinWindow:<n>  unpin process with id <n> from all desktops (short: /upw).");
-			Console.WriteLine("/IsWindowPinned:<s>  check if process with name <s> is pinned to all desktops");
-			Console.WriteLine("                   (short: /iwp). Returns 0 for yes, 1 for no.");
-			Console.WriteLine("/IsWindowPinned:<n>  check if process with id <n> is pinned to all desktops");
-			Console.WriteLine("                   (short: /iwp). Returns 0 for yes, 1 for no.");
-			Console.WriteLine("/PinApplication:<s>  pin application with name <s> to all desktops (short: /pa)");
-			Console.WriteLine("/PinApplication:<n>  pin application with process id <n> to all desktops");
+			Console.WriteLine("/GetDesktopFromWindow:<s|n>  get desktop number where process with name <s> or");
+			Console.WriteLine("                   id <n> is displayed (short: /gdfw).");
+			Console.WriteLine("/GetDesktopFromWindowHandle:<s|n>  get desktop number where window with text");
+			Console.WriteLine("                   <s> in title or handle <n> is displayed (short: /gdfwh).");
+			Console.WriteLine("/IsWindowOnDesktop:<s|n>  check if process with name <s> or id <n> is on");
+			Console.WriteLine("                   desktop with number in pipeline (short: /iwod). Returns 0");
+			Console.WriteLine("                   for yes, 1 for no.");
+			Console.WriteLine("/IsWindowHandleOnDesktop:<s|n>  check if window with text <s> in title or");
+			Console.WriteLine("                   handle <n> is on desktop with number in pipeline");
+			Console.WriteLine("                   (short: /iwhod). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/PinWindow:<s|n>  pin process with name <s> or id <n> to all desktops");
+			Console.WriteLine("                   (short: /pw).");
+			Console.WriteLine("/PinWindowHandle:<s|n>  pin window with text <s> in title or handle <n> to all");
+			Console.WriteLine("                   desktops (short: /pwh).");
+			Console.WriteLine("/UnPinWindow:<s|n>  unpin process with name <s> or id <n> from all desktops");
+			Console.WriteLine("                   (short: /upw).");
+			Console.WriteLine("/UnPinWindowHandle:<s|n>  unpin window with text <s> in title or handle <n>");
+			Console.WriteLine("                   from all desktops (short: /upwh).");
+			Console.WriteLine("/IsWindowPinned:<s|n>  check if process with name <s> or id <n> is pinned to");
+			Console.WriteLine("                   all desktops (short: /iwp). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/IsWindowHandlePinned:<s|n>  check if window with text <s> in title or handle");
+			Console.WriteLine("                   <n> is pinned to all desktops (short: /iwhp). Returns 0 for");
+			Console.WriteLine("                   yes, 1 for no.");
+			Console.WriteLine("/PinApplication:<s|n>  pin application with name <s> or id <n> to all desktops");
 			Console.WriteLine("                   (short: /pa).");
-			Console.WriteLine("/UnPinApplication:<s>  unpin application with name <s> from all desktops");
-			Console.WriteLine("                   (short: /upa).");
-			Console.WriteLine("/UnPinApplication:<n>  unpin application with process id <n> from all desktops");
-			Console.WriteLine("                   (short: /upa).");
-			Console.WriteLine("/IsApplicationPinned:<s>  check if application with name <s> is pinned to all");
-			Console.WriteLine("                   desktops (short: /iap). Returns 0 for yes, 1 for no.");
-			Console.WriteLine("/IsApplicationPinned:<n>  check if application with process id <n> is pinned to");
-			Console.WriteLine("                   all desktops (short: /iap). Returns 0 for yes, 1 for no.");
+			Console.WriteLine("/UnPinApplication:<s|n>  unpin application with name <s> or id <n> from all");
+			Console.WriteLine("                   desktops (short: /upa).");
+			Console.WriteLine("/IsApplicationPinned:<s|n>  check if application with name <s> or id <n> is");
+			Console.WriteLine("                   pinned to all desktops (short: /iap). Returns 0 for yes, 1");
+			Console.WriteLine("                   for no.");
 			Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
 			Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
+			Console.WriteLine("Hint: Insert ^^ somewhere in window title parameters to prevent finding the own");
+			Console.WriteLine("window. ^ is removed before searching window titles.\n");
 			Console.WriteLine("Examples:");
 			Console.WriteLine("Virtualdesktop.exe -New -Switch -GetCurrentDesktop");
+			Console.WriteLine("Virtualdesktop.exe Q N /MOVEACTIVEWINDOW /SWITCH");
 			Console.WriteLine("Virtualdesktop.exe sleep:200 gd:1 mw:notepad s");
 			Console.WriteLine("Virtualdesktop.exe /Count /continue /Remove /Remove /Count");
 			Console.WriteLine("VirtualDesktop.exe -IsWindowPinned:cmd");
 			Console.WriteLine("if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd");
+			Console.WriteLine("Virtualdesktop.exe -GetDesktop:1 \"-MoveWindowHandle:note^^pad\"");
 		}
 
 	}

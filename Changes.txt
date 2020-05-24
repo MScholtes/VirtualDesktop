@@ -1,5 +1,10 @@
 Changes:
 
+Version 1.5, 2020-05-24
+- extended parameter /MoveWindowHandle to search for window title
+- new parameters /GetDesktopFromWindowHandle, /IsWindowHandleOnDesktop, /PinWindowHandle, /UnPinWindowHandle and /IsWindowHandlePinned
+- several small corrections
+
 Version 1.4.4, 2020-03-22
 - new parameters /Wrap and /NoWrap
 - /Left and /right switch over the edge when /Warp is supplied
@@ -9,7 +14,7 @@ Version 1.4.3, 2020-03-08
 - added meta data and icon to executables
 
 Version 1.4.2, 2019-12-14
-- merged new function MoveWindowHandle by Zoynels 
+- merged new function MoveWindowHandle by Zoynels
 
 Version 1.4.1, 2019-07-15
 - errors are written to the error stream (thanks to DennisKae)

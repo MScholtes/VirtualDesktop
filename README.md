@@ -1,5 +1,5 @@
 # VirtualDesktop
-V1.4.4, 2020-03-22
+V1.5, 2020-05-24
 
 C# command line tool to manage virtual desktops in Windows 10<br><br>
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
@@ -23,73 +23,75 @@ Virtual desktop numbers start with 0.
 
 **/Count**           get count of virtual desktops to pipeline (short: /c).
 
-**/GetDesktop:(n)**  get number of virtual desktop (n) to pipeline (short: /gd).
+**/GetDesktop:&lt;n&gt;**  get number of virtual desktop &lt;n&gt; to pipeline (short: /gd).
 
 **/GetCurrentDesktop**  get number of current desktop to pipeline (short: /gcd).
 
-**/IsVisible[:(n)]**  is desktop number (n) or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
+**/IsVisible[:&lt;n&gt;]**  is desktop number &lt;n&gt; or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
 
-**/Switch[:(n)]**    switch to desktop with number (n) or with number in pipeline (short: /s).
+**/Switch[:&lt;n&gt;]**    switch to desktop with number &lt;n&gt; or with number in pipeline (short: /s).
 
 **/Left**            switch to virtual desktop to the left of the active desktop (short: /l).
 
 **/Right**           switch to virtual desktop to the right of the active desktop (short: /ri).
 
 **/Wrap /NoWrap**    /Left or /Right switch over or generate an error when the edge is reached (default)(short /w and /nw).
- 
+
 **/New**             create new desktop (short: /n). Number is stored in pipeline.
 
-**/Remove[:(n)]**    remove desktop number (n) or desktop with number in pipeline (short: /r).
+**/Remove[:&lt;n&gt;]**    remove desktop number &lt;n&gt; or desktop with number in pipeline (short: /r).
 
-**/MoveWindow:(s)**  move process with name (s) to desktop with number in pipeline (short: /mw).
+**/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
-**/MoveWindow:(n)**  move process with id (n) to desktop with number in pipeline (short: /mw).
-
-**/MoveWindowHandle:(n)**  move window with handle (n) to desktop with number in pipeline (short: /mwh).
+**/MoveWindowHandle:&lt;s|n&gt;**  move window with window with text &lt;n&gt; in title or handle &lt;n&gt; to desktop with number in pipeline (short: /mwh).
 
 **/MoveActiveWindow**  move active window to desktop with number in pipeline (short: /maw).
 
-**/GetDesktopFromWindow:(s)**  get desktop number where process with name (s) is displayed (short: /gdfw).
+**/GetDesktopFromWindow:&lt;s|n&gt;**  get desktop number where process with name &lt;s&gt; or id &lt;n&gt; is displayed (short: /gdfw).
 
-**/GetDesktopFromWindow:(n)**  get desktop number where process with id (n) is displayed (short: /gdfw).
+**/GetDesktopFromWindowHandle:&lt;s|n&gt;**  get desktop number where window with text &lt;s&gt; in title or handle &lt;n&gt; is displayed (short: /gdfwh).
 
-**/IsWindowOnDesktop:(s)**  check if process with name (s) is on desktop with number in pipeline (short: /iwod). Returns 0 for yes, 1 for no.
+**/IsWindowOnDesktop:&lt;s|n&gt;**  check if process with name &lt;s&gt; or id &lt;n&gt; is on desktop with number in pipeline (short: /iwod). Returns 0 for yes, 1 for no.
 
-**/IsWindowOnDesktop:(n)**  check if process with id (n) is on desktop with number in pipeline (short: /iwod). Returns 0 for yes, 1 for no.
+**/IsWindowHandleOnDesktop:&lt;s|n&gt;**  check if window with text &lt;s&gt; in title or handle &lt;n&gt; is on desktop with number in pipeline (short: /iwhod). Returns 0 for yes, 1 for no.
 
-**/PinWindow:(s)**   pin process with name (s) to all desktops (short: /pw).
+**/PinWindow:&lt;s|n&gt;**   pin process with name &lt;s&gt; or id &lt;n&gt; to all desktops (short: /pw).
 
-**/PinWindow:(n)**   pin process with id (n) to all desktops (short: /pw).
+**/PinWindowHandle:&lt;s|n&gt;**   pin window with text &lt;s&gt; in title or handle &lt;n&gt; to all desktops (short: /pwh).
 
-**/UnPinWindow:(s)**  unpin process with name (s) from all desktops (short: /upw).
+**/UnPinWindow:&lt;s|n&gt;**  unpin process with name &lt;s&gt; or id &lt;n&gt; from all desktops (short: /upw).
 
-**/UnPinWindow:(n)**  unpin process with id (n) from all desktops (short: /upw).
+**/UnPinWindowHandle:&lt;s|n&gt;**  unpin window with text &lt;s&gt; in title or handle &lt;n&gt; from all desktops (short: /upwh).
 
-**/IsWindowPinned:(s)**  check if process with name (s) is pinned to all desktops (short: /iwp). Returns 0 for yes, 1 for no.
+**/IsWindowPinned:&lt;s|n&gt;**  check if process with name &lt;s&gt; or id &lt;n&gt; is pinned to all desktops (short: /iwp). Returns 0 for yes, 1 for no.
 
-**/IsWindowPinned:(n)**  check if process with id (n) is pinned to all desktops (short: /iwp). Returns 0 for yes, 1 for no.
+**/IsWindowHandlePinned:&lt;s|n&gt;**  check if window with text &lt;s&gt; in title or handle &lt;n&gt; is pinned to all desktops (short: /iwhp). Returns 0 for yes, 1 for no.
 
-**/PinApplication:(s)**  pin application with name (s) to all desktops (short: /pa).
+**/PinApplication:&lt;s|n&gt;**  pin application with name &lt;s&gt; or id &lt;n&gt; to all desktops (short: /pa).
 
-**/PinApplication:(n)**  pin application with process id (n) to all desktops (short: /pa).
+**/UnPinApplication:&lt;s|n&gt;**  unpin application with name &lt;s&gt; or id &lt;n&gt; from all desktops (short: /upa).
 
-**/UnPinApplication:(s)**  unpin application with name (s) from all desktops (short: /upa).
-
-**/UnPinApplication:(n)**  unpin application with process id (n) from all desktops (short: /upa).
-
-**/IsApplicationPinned:(s)**  check if application with name (s) is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.
-
-**/IsApplicationPinned:(n)**  check if application with process id (n) is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.
+**/IsApplicationPinned:&lt;s|n&gt;**  check if application with name &lt;s&gt; or id &lt;n&gt; is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.
 
 **/WaitKey**       wait for key press (short: /wk).
 
-**/Sleep:(n)**     wait for (n) milliseconds (short: /sl).
+**/Sleep:&lt;n&gt;**     wait for &lt;n&gt; milliseconds (short: /sl).
+
+## Hint:
+Insert ^^ somewhere in window title parameters to prevent finding the own window. ^ is removed before searching window titles.
 
 ## Examples:
-```
+```bat
 Virtualdesktop.exe -New -Switch -GetCurrentDesktop
+
+Virtualdesktop.exe Q N /MOVEACTIVEWINDOW /SWITCH
+
 Virtualdesktop.exe sleep:200 gd:1 mw:notepad s
+
 Virtualdesktop.exe /Count /continue /Remove /Remove /Count
+
 VirtualDesktop.exe -IsWindowPinned:cmd
 if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
+
+Virtualdesktop.exe -GetDesktop:1 "-MoveWindowHandle:note^^pad"
 ```
