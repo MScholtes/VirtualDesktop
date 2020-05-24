@@ -43,7 +43,7 @@ Virtual desktop numbers start with 0.
 
 **/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
-**/MoveWindowHandle:&lt;s|n&gt;**  move window with window with text &lt;n&gt; in title or handle &lt;n&gt; to desktop with number in pipeline (short: /mwh).
+**/MoveWindowHandle:&lt;s|n&gt;**  move window with text &lt;s&gt; in title or handle &lt;n&gt; to desktop with number in pipeline (short: /mwh).
 
 **/MoveActiveWindow**  move active window to desktop with number in pipeline (short: /maw).
 
@@ -94,4 +94,8 @@ VirtualDesktop.exe -IsWindowPinned:cmd
 if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
 
 Virtualdesktop.exe -GetDesktop:1 "-MoveWindowHandle:note^^pad"
+
+for /f "tokens=4 delims= " %i in ('VirtualDesktop.exe c') do @set DesktopCount=%i
+echo Count of desktops is %DesktopCount%
+if %DesktopCount% GTR 1 VirtualDesktop.exe REMOVE
 ```
