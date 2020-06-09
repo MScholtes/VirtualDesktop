@@ -485,6 +485,11 @@ namespace VirtualDesktop
 		// Get handle of active window
 		[DllImport("user32.dll")]
 		public static extern IntPtr GetForegroundWindow();
+
+		public static Guid Guid()
+		{
+			return ivd.GetId();
+		}
 	}
 }
 
@@ -497,6 +502,7 @@ namespace VDeskTool
 		static bool breakonerror = true;
 		static bool wrapdesktops = false;
 		static int rc = 0;
+		static Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
 
 		static int Main(string[] args)
 		{
@@ -575,6 +581,15 @@ namespace VDeskTool
 								if (verbose) Console.WriteLine("Number of current desktop: " + rc);
 								break;
 
+							case "GETCURRENTDESKTOPNAME": // get Name of current desktop
+							case "GCDN":
+								guid = VirtualDesktop.Desktop.Guid();
+								if (verbose) Console.WriteLine(Microsoft.Win32.Registry.GetValue(
+										"HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VirtualDesktops\\Desktops\\{" + guid + "}",
+										"Name",
+										null
+									));
+								break;
 							case "ISVISIBLE": // is desktop in rc visible?
 							case "IV":
 								if ((rc >= 0) && (rc < VirtualDesktop.Desktop.Count))
@@ -1567,6 +1582,7 @@ namespace VDeskTool
 			Console.WriteLine("/Count           get count of virtual desktops to pipeline (short: /c).");
 			Console.WriteLine("/GetDesktop:<n>  get number of virtual desktop <n> to pipeline (short: /gd).");
 			Console.WriteLine("/GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).");
+			Console.WriteLine("/GetCurrentDesktopName  get number of current desktop to pipeline (short: /gcdn).");
 			Console.WriteLine("/IsVisible[:<n>]  is desktop number <n> or number in pipeline visible (short:");
 			Console.WriteLine("                    /iv)? Returns 0 for visible and 1 for invisible.");
 			Console.WriteLine("/Switch[:<n>]    switch to desktop with number <n> or with number in pipeline");
