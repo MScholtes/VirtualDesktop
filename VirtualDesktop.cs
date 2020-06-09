@@ -486,7 +486,7 @@ namespace VirtualDesktop
 		[DllImport("user32.dll")]
 		public static extern IntPtr GetForegroundWindow();
 
-		public static Guid Guid()
+        public Guid Id()
 		{
 			return ivd.GetId();
 		}
@@ -502,7 +502,7 @@ namespace VDeskTool
 		static bool breakonerror = true;
 		static bool wrapdesktops = false;
 		static int rc = 0;
-		static Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
+		static Guid id = new Guid("00000000-0000-0000-0000-000000000000");
 
 		static int Main(string[] args)
 		{
@@ -583,9 +583,9 @@ namespace VDeskTool
 
 							case "GETCURRENTDESKTOPNAME": // get Name of current desktop
 							case "GCDN":
-								guid = VirtualDesktop.Desktop.Guid();
+								id = VirtualDesktop.Desktop.Current.Id();
 								if (verbose) Console.WriteLine(Microsoft.Win32.Registry.GetValue(
-										"HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VirtualDesktops\\Desktops\\{" + guid + "}",
+										"HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VirtualDesktops\\Desktops\\{" + id + "}",
 										"Name",
 										null
 									));
