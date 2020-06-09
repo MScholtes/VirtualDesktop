@@ -1582,7 +1582,7 @@ namespace VDeskTool
 			Console.WriteLine("/Count           get count of virtual desktops to pipeline (short: /c).");
 			Console.WriteLine("/GetDesktop:<n>  get number of virtual desktop <n> to pipeline (short: /gd).");
 			Console.WriteLine("/GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).");
-			Console.WriteLine("/GetCurrentDesktopName  get number of current desktop to pipeline (short: /gcdn).");
+			Console.WriteLine("/GetCurrentDesktopName  get name of current desktop to pipeline (short: /gcdn).");
 			Console.WriteLine("/IsVisible[:<n>]  is desktop number <n> or number in pipeline visible (short:");
 			Console.WriteLine("                    /iv)? Returns 0 for visible and 1 for invisible.");
 			Console.WriteLine("/Switch[:<n>]    switch to desktop with number <n> or with number in pipeline");
