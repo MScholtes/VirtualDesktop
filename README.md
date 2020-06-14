@@ -1,5 +1,5 @@
 # VirtualDesktop
-V1.5, 2020-05-24
+V1.6, 2020-06-14
 
 C# command line tool to manage virtual desktops in Windows 10<br><br>
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
@@ -21,15 +21,17 @@ Virtual desktop numbers start with 0.
 
 **/Break /Continue** break (default) or continue on error (short: /b and /co).
 
+**/List**            list all virtual desktops (short: /li).
+
 **/Count**           get count of virtual desktops to pipeline (short: /c).
 
-**/GetDesktop:&lt;n&gt;**  get number of virtual desktop &lt;n&gt; to pipeline (short: /gd).
+**/GetDesktop:&lt;n|s&gt;**  get number of virtual desktop &lt;n&gt; or desktop with text &lt;s&gt; in name to pipeline (short: /gd).
 
 **/GetCurrentDesktop**  get number of current desktop to pipeline (short: /gcd).
 
-**/IsVisible[:&lt;n&gt;]**  is desktop number &lt;n&gt; or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
+**/IsVisible[:&lt;n|s&gt;]**  is desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
 
-**/Switch[:&lt;n&gt;]**    switch to desktop with number &lt;n&gt; or with number in pipeline (short: /s).
+**/Switch[:&lt;n|s&gt;]**    switch to desktop with number &lt;n&gt;, desktop with text &lt;s&gt; in name or with number in pipeline (short: /s).
 
 **/Left**            switch to virtual desktop to the left of the active desktop (short: /l).
 
@@ -39,7 +41,7 @@ Virtual desktop numbers start with 0.
 
 **/New**             create new desktop (short: /n). Number is stored in pipeline.
 
-**/Remove[:&lt;n&gt;]**    remove desktop number &lt;n&gt; or desktop with number in pipeline (short: /r).
+**/Remove[:&lt;n|s&gt;]**    remove desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /r).
 
 **/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
@@ -82,6 +84,10 @@ Insert ^^ somewhere in window title parameters to prevent finding the own window
 
 ## Examples:
 ```bat
+Virtualdesktop.exe /LIST
+
+Virtualdesktop.exe "-Switch:Desktop 2"
+
 Virtualdesktop.exe -New -Switch -GetCurrentDesktop
 
 Virtualdesktop.exe Q N /MOVEACTIVEWINDOW /SWITCH
