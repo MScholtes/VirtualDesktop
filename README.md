@@ -1,13 +1,13 @@
 # VirtualDesktop
-V1.6, 2020-06-14
+V1.7, 2020-06-16
 
-C# command line tool to manage virtual desktops in Windows 10<br>
+C# command line tool to manage virtual desktops in Windows 10
 
-Version 1.6 with support for reading the new desktop names of Windows 10 2004. A version with support for setting names with the new OLE interface IVirtualDesktopManagerInternal2 coming soon!<br>
+Now with support for desktop names introduced with Windows 10 2004! New parameter /Name to set or remove names.
 
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
-**With Windows 10 1809 Microsoft changed the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809 and newer, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
+**With Windows 10 2004 Microsoft thankfully did not change the API (COM GUIDs) for accessing the functions for virtual desktops, but implemented two new interfaces. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809 and newer, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
 
 ## Generate:
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
@@ -31,6 +31,8 @@ Virtual desktop numbers start with 0.
 **/GetDesktop:&lt;n|s&gt;**  get number of virtual desktop &lt;n&gt; or desktop with text &lt;s&gt; in name to pipeline (short: /gd).
 
 **/GetCurrentDesktop**  get number of current desktop to pipeline (short: /gcd).
+
+**/Name[:&lt;s&gt;]      set name of desktop with number in pipeline (short: /na).
 
 **/IsVisible[:&lt;n|s&gt;]**  is desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
 

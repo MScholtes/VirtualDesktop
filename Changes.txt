@@ -1,8 +1,12 @@
 Changes:
 
+Version 1.7, 2020-06-16
+- support for Windows 10 2004
+- new parameter /Name to set desktop names (only available with Windows 10 2004 or newer)
+
 Version 1.6, 2020-06-14
-- shows desktop names (new Windows 10 20H1 names and old "Desktop n" names)
-- search for desktop with name part in parameters /GetDesktop, /IsVisible /Switch and /Remove
+- shows desktop names (new Windows 10 2004 names and old "Desktop n" names)
+- search for desktop with name part in parameters /GetDesktop, /IsVisible, /Switch and /Remove
 - new parameter /List
 
 Version 1.5, 2020-05-24

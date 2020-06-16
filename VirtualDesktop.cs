@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2020
-// Version 1.6, 2020-06-14
+// Version 1.7, 2020-06-16
 // Version for Windows 10 1809 and up
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -19,10 +19,10 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2020")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.6.0.0")]
-[assembly:AssemblyFileVersion("1.6.0.0")]
+[assembly:AssemblyVersion("1.7.0.0")]
+[assembly:AssemblyFileVersion("1.7.0.0")]
 
-// Based on http://stackoverflow.com/a/32417530, Windows 10 SDK and github project VirtualDesktop
+// Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
 namespace VirtualDesktop
 {
@@ -153,6 +153,25 @@ namespace VirtualDesktop
 		Guid GetId();
 	}
 
+/*
+IVirtualDesktop2 not used now (available since Win 10 2004), instead reading names out of registry for compatibility reasons
+Excample code:
+IVirtualDesktop2 ivd2;
+string desktopName;
+ivd2.GetName(out desktopName);
+Console.WriteLine("Name of desktop: " + desktopName);
+
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid("31EBDE3F-6EC3-4CBD-B9FB-0EF6D09B41F4")]
+	internal interface IVirtualDesktop2
+	{
+		bool IsViewVisible(IApplicationView view);
+		Guid GetId();
+		void GetName([MarshalAs(UnmanagedType.HString)] out string name);
+	}
+*/
+
 	[ComImport]
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	[Guid("F31574D6-B682-4CDC-BD56-1827860ABEC6")]
@@ -169,6 +188,26 @@ namespace VirtualDesktop
 		IVirtualDesktop CreateDesktop();
 		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
 		IVirtualDesktop FindDesktop(ref Guid desktopid);
+	}
+
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid("0F3A72B0-4566-487E-9A33-4ED302F6D6CE")]
+	internal interface IVirtualDesktopManagerInternal2
+	{
+		int GetCount();
+		void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
+		bool CanViewMoveDesktops(IApplicationView view);
+		IVirtualDesktop GetCurrentDesktop();
+		void GetDesktops(out IObjectArray desktops);
+		[PreserveSig]
+		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
+		void SwitchDesktop(IVirtualDesktop desktop);
+		IVirtualDesktop CreateDesktop();
+		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
+		IVirtualDesktop FindDesktop(ref Guid desktopid);
+		void Unknown1(IVirtualDesktop desktop, out IntPtr unknown1, out IntPtr unknown2);
+		void SetName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
 	}
 
 	[ComImport]
@@ -220,12 +259,19 @@ namespace VirtualDesktop
 		{
 			var shell = (IServiceProvider10)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
 			VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal).GUID);
+try {
+			VirtualDesktopManagerInternal2 = (IVirtualDesktopManagerInternal2)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal2).GUID);
+}
+catch {
+	VirtualDesktopManagerInternal2 = null;
+}
 			VirtualDesktopManager = (IVirtualDesktopManager)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_VirtualDesktopManager));
 			ApplicationViewCollection = (IApplicationViewCollection)shell.QueryService(typeof(IApplicationViewCollection).GUID, typeof(IApplicationViewCollection).GUID);
 			VirtualDesktopPinnedApps = (IVirtualDesktopPinnedApps)shell.QueryService(Guids.CLSID_VirtualDesktopPinnedApps, typeof(IVirtualDesktopPinnedApps).GUID);
 		}
 
 		internal static IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
+		internal static IVirtualDesktopManagerInternal2 VirtualDesktopManagerInternal2;
 		internal static IVirtualDesktopManager VirtualDesktopManager;
 		internal static IApplicationViewCollection ApplicationViewCollection;
 		internal static IVirtualDesktopPinnedApps VirtualDesktopPinnedApps;
@@ -407,6 +453,14 @@ namespace VirtualDesktop
 				fallbackdesktop = fallback.ivd;
 
 			DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(ivd, fallbackdesktop);
+		}
+
+		public void SetName(string Name)
+		{ // set name for desktop, empty string removes names
+			if (DesktopManager.VirtualDesktopManagerInternal2 != null)
+			{ // only if interface to set name is present
+				DesktopManager.VirtualDesktopManagerInternal2.SetName(this.ivd, Name);
+			}
 		}
 
 		public bool IsVisible
@@ -739,6 +793,20 @@ namespace VDeskTool
 								}
 								break;
 
+							case "NAME": // removing name of desktop in rc
+							case "NA":
+									try
+									{ // remove desktop name
+										VirtualDesktop.Desktop.FromIndex(rc).SetName("");
+										if (verbose) Console.WriteLine("Removed name of desktop number " + rc.ToString());
+									}
+									catch
+									{ // error while removing name
+										if (verbose) Console.WriteLine("Error removing desktop name");
+										rc = -1;
+									}
+								break;
+
 							case "REMOVE": // remove desktop in rc
 							case "R":
 								if (verbose)
@@ -859,6 +927,20 @@ namespace VDeskTool
 										rc = -2;
 									}
 								}
+								break;
+
+							case "NAME": // set name of desktop in rc
+							case "NA":
+									try
+									{ // set desktop name
+										VirtualDesktop.Desktop.FromIndex(rc).SetName(groups[2].Value);
+										if (verbose) Console.WriteLine("Set name of desktop number " + rc.ToString() + " to '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "'");
+									}
+									catch
+									{ // error while setting name
+										if (verbose) Console.WriteLine("Error setting desktop name to '" + groups[2].Value + "'");
+										rc = -1;
+									}
 								break;
 
 							case "SWITCH": // switch to desktop
@@ -1709,7 +1791,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.6\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.7\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
@@ -1725,6 +1807,7 @@ namespace VDeskTool
 			Console.WriteLine("/GetDesktop:<n|s> get number of virtual desktop <n> or desktop with text <s> in");
 			Console.WriteLine("                   name to pipeline (short: /gd).");
 			Console.WriteLine("/GetCurrentDesktop  get number of current desktop to pipeline (short: /gcd).");
+			Console.WriteLine("/Name[:<s>]      set name of desktop with number in pipeline (short: /na).");
 			Console.WriteLine("/IsVisible[:<n|s>] is desktop number <n>, desktop with text <s> in name or with");
 			Console.WriteLine("                   number in pipeline visible (short: /iv)? Returns 0 for");
 			Console.WriteLine("                   visible and 1 for invisible.");
