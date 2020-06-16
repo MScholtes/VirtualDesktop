@@ -1,5 +1,5 @@
 # VirtualDesktop
-V1.7, 2020-06-16
+**V1.7, 2020-06-16**
 
 C# command line tool to manage virtual desktops in Windows 10
 
@@ -32,7 +32,7 @@ Virtual desktop numbers start with 0.
 
 **/GetCurrentDesktop**  get number of current desktop to pipeline (short: /gcd).
 
-**/Name[:&lt;s&gt;]      set name of desktop with number in pipeline (short: /na).
+**/Name[:&lt;s&gt;]**      set name of desktop with number in pipeline (short: /na).
 
 **/IsVisible[:&lt;n|s&gt;]**  is desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
 
