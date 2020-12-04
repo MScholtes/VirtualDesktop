@@ -107,6 +107,8 @@ Virtualdesktop.exe sleep:200 gd:1 mw:notepad s
 
 Virtualdesktop.exe /Count /continue /Remove /Remove /Count
 
+Virtualdesktop.exe /Count /Calc:-1 /Switch
+
 VirtualDesktop.exe -IsWindowPinned:cmd
 if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
 
