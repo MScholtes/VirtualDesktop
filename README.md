@@ -1,9 +1,9 @@
 # VirtualDesktop
-**V1.7, 2020-06-16**
-
 C# command line tool to manage virtual desktops in Windows 10
 
-Now with support for desktop names introduced with Windows 10 2004! New parameter /Name to set or remove names.
+**V1.8, 2020-12-03**
+- new parameters /SwapDesktop and /InsertDesktop to rearrange desktops
+- new parameter /Calc to add to or substract from the desktop number in pipeline
 
 (look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
@@ -48,6 +48,10 @@ Virtual desktop numbers start with 0.
 
 **/Remove[:&lt;n|s&gt;]**    remove desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /r).
 
+**/SwapDesktop:&lt;n|s&gt;**  swap desktop in pipeline with desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /sd).
+
+**/InsertDesktop:&lt;n|s&gt;**  insert desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline before desktop in pipeline or vice versa (short: /id).
+
 **/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
 **/MoveWindowHandle:&lt;s|n&gt;**  move window with text &lt;s&gt; in title or handle &lt;n&gt; to desktop with number in pipeline (short: /mwh).
@@ -79,6 +83,8 @@ Virtual desktop numbers start with 0.
 **/UnPinApplication:&lt;s|n&gt;**  unpin application with name &lt;s&gt; or id &lt;n&gt; from all desktops (short: /upa).
 
 **/IsApplicationPinned:&lt;s|n&gt;**  check if application with name &lt;s&gt; or id &lt;n&gt; is pinned to all desktops (short: /iap). Returns 0 for yes, 1 for no.
+
+**/Calc:&lt;n&gt;**        add &lt;n&gt; to result, negative values are allowed (short: /ca).
 
 **/WaitKey**       wait for key press (short: /wk).
 

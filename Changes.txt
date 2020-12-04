@@ -1,5 +1,9 @@
 Changes:
 
+Version 1.8, 2020-12-03
+- new parameters /SwapDesktop and /InsertDesktop to rearrange desktops
+- new parameter /Calc to add to or substract from the desktop number in pipeline
+
 Version 1.7, 2020-06-16
 - support for Windows 10 2004
 - new parameter /Name to set desktop names (only available with Windows 10 2004 or newer)
