@@ -5,7 +5,7 @@ C# command line tool to manage virtual desktops in Windows 10
 - new parameters /SwapDesktop and /InsertDesktop to rearrange desktops
 - new parameter /Calc to add to or substract from the desktop number in pipeline
 
-(look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
+(look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://github.com/MScholtes/TechNet-Gallery)
 
 **With Windows 10 2004 Microsoft thankfully did not change the API (COM GUIDs) for accessing the functions for virtual desktops, but implemented two new interfaces. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809 and newer, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
 
