@@ -114,6 +114,9 @@ if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
 
 Virtualdesktop.exe -GetDesktop:1 "-MoveWindowHandle:note^^pad"
 
+REM Insert desktop 7 before deskto p5
+VirtualDesktop.exe /GetDesktop:7 /InsertDesktop:5
+
 for /f "tokens=4 delims= " %i in ('VirtualDesktop.exe c') do @set DesktopCount=%i
 echo Count of desktops is %DesktopCount%
 if %DesktopCount% GTR 1 VirtualDesktop.exe REMOVE
