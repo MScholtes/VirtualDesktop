@@ -1,6 +1,9 @@
 # VirtualDesktop
 C# command line tool to manage virtual desktops in Windows 10
 
+Thanks to [NyaMisty](https://github.com/NyaMisty) there is a first version for Windows Insider 21H2 and Windows 11 Insider now. This is an **alpha version**, not all functions are tested, some are faulty, some not implemented. For example I am experiencing starnge behaviour with naming desktops and setting virtual desktop background (see new parameter Wallpaper: -> the regular expression has to be reworked).
+
+
 **V1.8, 2020-12-03**
 - new parameters /SwapDesktop and /InsertDesktop to rearrange desktops
 - new parameter /Calc to add to or substract from the desktop number in pipeline
