@@ -1,7 +1,7 @@
 # VirtualDesktop
 C# command line tool to manage virtual desktops in Windows 10
 
-Thanks to [NyaMisty](https://github.com/NyaMisty) there is a first version for Windows Insider 21H2 and Windows 11 Insider now. This is an **alpha version**, not all functions are tested, some are faulty, some not implemented. Setting names and individual wallpapers seems to work now, removing wallpapers leads to crashing Windows explorers.
+Thanks to [NyaMisty](https://github.com/NyaMisty) there is a first version for Windows Insider 21H2 and Windows 11 Insider now. This is an **alpha version**, not all functions are tested, some are faulty, some not implemented. Setting names and individual wallpapers (new parameter /WallPaper:) seem to work now, removing wallpapers lead to crashing Windows Explorers. Implemented new native function /Movedesktop: instead of homebrew /InsertDesktop:. See  help screen.
 
 
 **V1.8, 2020-12-03**
