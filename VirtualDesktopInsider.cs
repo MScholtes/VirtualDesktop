@@ -617,7 +617,7 @@ namespace VDeskTool
 
 			foreach (string arg in args)
 			{
-				System.Text.RegularExpressions.GroupCollection groups = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?([^:=]*)$").Groups;
+				System.Text.RegularExpressions.GroupCollection groups = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?(.*)$").Groups;
 
 				if (groups.Count != 3)
 				{ // parameter error
@@ -696,7 +696,7 @@ namespace VDeskTool
 									if (string.IsNullOrEmpty(VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i)))
 										Console.WriteLine();
 									else
-										Console.WriteLine(" - Wallpaper: " + VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i));
+										Console.WriteLine(" (Wallpaper: " + VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i) + ")");
 								}
 								if (verbose) Console.WriteLine("\nCount of desktops: " + desktopCount);
 								break;
