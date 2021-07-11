@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2021
-// Version 1.9, 2021-07-04
+// Version 1.9alpha, 2021-07-11
 // Version for Windows Insider (10 21H2 and 11)
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktopInsider.cs
@@ -396,7 +396,7 @@ namespace VirtualDesktop
 		}
 
 		public static string DesktopWallpaperFromIndex(int index)
-		{ // return name of desktop wallpaper from index (-> index = 0..Count-1) or "Desktop n" if it has no name
+		{ // return name of desktop wallpaper from index (-> index = 0..Count-1)
 
 			// get desktop name
 			string desktopwppath = "";
@@ -448,6 +448,11 @@ namespace VirtualDesktop
 				fallbackdesktop = fallback.ivd;
 
 			DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(ivd, fallbackdesktop);
+		}
+
+		public void Move(int index)
+		{ // swap current desktop with desktop in index (-> index = 0..Count-1)
+			DesktopManager.VirtualDesktopManagerInternal.MoveDesktop(ivd, IntPtr.Zero, index);
 		}
 
 		public void SetName(string Name)
@@ -1111,16 +1116,16 @@ namespace VDeskTool
 								}
 								break;
 
-							case "INSERTDESKTOP": // insert desktop
-							case "ID":
+							case "MOVEDESKTOP": // move desktop
+							case "MD":
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count) && (rc != iParam))
-									{ // check if parameter is 0 and in range of active desktops
-										if (verbose) Console.WriteLine("Inserting virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "') before desktop number " + rc.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') or vice versa");
+									{ // check if parameter in range of active desktops
+										if (verbose) Console.WriteLine("Moving virtual desktop number " + rc.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') to desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "')");
 										try
-										{ // insert virtual desktop iParam before rc
-											InsertDesktop(rc, iParam);
+										{ // move virtual desktop index rc to index iParam
+											VirtualDesktop.Desktop.FromIndex(rc).Move(iParam);
 											rc = iParam;
 										}
 										catch
@@ -1136,10 +1141,10 @@ namespace VDeskTool
 									iParam = VirtualDesktop.Desktop.SearchDesktop(groups[2].Value);
 									if ((iParam >= 0) && (rc != iParam))
 									{ // desktop found
-										if (verbose) Console.WriteLine("Inserting virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "') before desktop number " + rc.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') or vice versa");
+										if (verbose) Console.WriteLine("Moving virtual desktop number " + rc.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') to desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "')");
 										try
-										{ // insert virtual desktop iParam before rc
-											InsertDesktop(rc, iParam);
+										{ // move virtual desktop index rc to index iParam
+											VirtualDesktop.Desktop.FromIndex(rc).Move(iParam);
 											rc = iParam;
 										}
 										catch
@@ -1151,7 +1156,7 @@ namespace VDeskTool
 									{ // no desktop found or source and target the same
 										if (rc == iParam)
 										{
-											if (verbose) Console.WriteLine("Cannot insert virtual desktop before itself");
+											if (verbose) Console.WriteLine("Cannot move virtual desktop to itself");
 										}
 										else
 										{
@@ -1974,63 +1979,6 @@ namespace VDeskTool
 			VirtualDesktop.Desktop.FromIndex(iSwapDesktop2).SetName(desktopname1);
 		}
 
-		private static int iInsertDesktop1;
-		private static int iInsertDesktop2;
-
-		private static bool EnumWindowsProcToInsert(IntPtr hWnd, int lParam)
-		{
-			StringBuilder windowText = new StringBuilder(MAXTITLE);
-			int titleLength = GetWindowText(hWnd, windowText, windowText.Capacity + 1);
-			windowText.Length = titleLength;
-			string title = windowText.ToString();
-
-			if (!string.IsNullOrEmpty(title) && IsWindowVisible(hWnd))
-			{
-				try {
-					int iDesktopIndex = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.FromWindow(hWnd));
-					if ((iDesktopIndex >= iInsertDesktop1) && (iDesktopIndex < iInsertDesktop2))
-						VirtualDesktop.Desktop.FromIndex(iDesktopIndex + 1).MoveWindow(hWnd);
-
-					if (iDesktopIndex == iInsertDesktop2) VirtualDesktop.Desktop.FromIndex(iInsertDesktop1).MoveWindow(hWnd);
-				}
-				catch { }
-			}
-
-			return true;
-		}
-
-		private static void InsertDesktop(int InsertIndex1, int InsertIndex2)
-		{
-			if (InsertIndex2 > InsertIndex1)
-			{
-				iInsertDesktop1 = InsertIndex1;
-				iInsertDesktop2 = InsertIndex2;
-			}
-			else
-			{
-				iInsertDesktop1 = InsertIndex2;
-				iInsertDesktop2 = InsertIndex1;
-			}
-			EnumDelegate enumfunc = new EnumDelegate(EnumWindowsProcToInsert);
-
-			EnumDesktopWindows(IntPtr.Zero, enumfunc, IntPtr.Zero);
-
-			string desktopname1 = "";
-			if (VirtualDesktop.Desktop.HasDesktopNameFromIndex(iInsertDesktop2))
-				desktopname1 = VirtualDesktop.Desktop.DesktopNameFromIndex(iInsertDesktop2);
-
-			for (int i = iInsertDesktop2 - 1; i >= iInsertDesktop1; i--)
-			{
-				string desktopname2 = "";
-				if (VirtualDesktop.Desktop.HasDesktopNameFromIndex(i))
-					desktopname2 = VirtualDesktop.Desktop.DesktopNameFromIndex(i);
-
-				VirtualDesktop.Desktop.FromIndex(i + 1).SetName(desktopname2);
-			}
-
-			VirtualDesktop.Desktop.FromIndex(iInsertDesktop1).SetName(desktopname1);
-		}
-
 		static void HelpScreen()
 		{
 			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2021, v1.9\n");
@@ -2069,9 +2017,8 @@ namespace VDeskTool
 			Console.WriteLine("/SwapDesktop:<n|s>  swap desktop in pipeline with desktop number <n>, desktop");
 			Console.WriteLine("                   with text <s> in name or desktop with number in pipeline");
 			Console.WriteLine("                   (short: /sd).");
-			Console.WriteLine("/InsertDesktop:<n|s>  insert desktop number <n>, desktop with text <s> in name");
-			Console.WriteLine("                   or desktop with number in pipeline before desktop in");
-			Console.WriteLine("                   pipeline or vice versa (short: /id).");
+			Console.WriteLine("/MoveDesktop:<n|s>  move desktop in pipeline to desktop number <n> or desktop");
+			Console.WriteLine("                   with text <s> in name (short: /md).");
 			Console.WriteLine("/MoveWindow:<s|n>  move process with name <s> or id <n> to desktop with number");
 			Console.WriteLine("                   in pipeline (short: /mw).");
 			Console.WriteLine("/MoveWindowHandle:<s|n>  move window with text <s> in title or handle <n> to");
