@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2021
-// Version 1.9alpha, 2021-07-11
+// Version 1.9alpha, 2021-07-13
 // Version for Windows Insider (10 21H2 and 11)
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktopInsider.cs
@@ -178,10 +178,10 @@ namespace VirtualDesktop
     void Unknown1(IVirtualDesktop desktop, out IntPtr unknown1, out IntPtr unknown2);
 		void SetName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
 		void SetWallpaperPath(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
-    void Unknown2([MarshalAs(UnmanagedType.HString)] string unknown1);
-    void Unknown3(IApplicationView pView0, IApplicationView pView1);
-    int Unknown4();
-    void Unknown5(int nNum);
+    void SetAllWallpaperPaths([MarshalAs(UnmanagedType.HString)] string path);
+    void Unknown2(IApplicationView pView0, IApplicationView pView1);
+    int Unknown3();
+    void RemoveAll(bool remove);
 	}
 
 	[ComImport]
@@ -449,9 +449,14 @@ namespace VirtualDesktop
 
 			DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(ivd, fallbackdesktop);
 		}
+		
+		public static void RemoveAll()
+		{ // remove all desktops but visible
+			DesktopManager.VirtualDesktopManagerInternal.RemoveAll(true);
+		}
 
 		public void Move(int index)
-		{ // swap current desktop with desktop in index (-> index = 0..Count-1)
+		{ // move current desktop to desktop in index (-> index = 0..Count-1)
 			DesktopManager.VirtualDesktopManagerInternal.MoveDesktop(ivd, IntPtr.Zero, index);
 		}
 
@@ -462,7 +467,14 @@ namespace VirtualDesktop
 
 		public void SetWallpaperPath(string Path)
 		{ // set path for wallpaper, empty string removes path
+			if (string.IsNullOrEmpty(Path)) throw new ArgumentNullException();
 			DesktopManager.VirtualDesktopManagerInternal.SetWallpaperPath(this.ivd, Path);
+		}
+
+		public static void SetAllWallpaperPaths(string Path)
+		{ // set wallpaper path for all desktops
+			if (string.IsNullOrEmpty(Path)) throw new ArgumentNullException();
+			DesktopManager.VirtualDesktopManagerInternal.SetAllWallpaperPaths(Path);
 		}
 
 		public bool IsVisible
@@ -813,20 +825,6 @@ namespace VDeskTool
 									}
 								break;
 
-							case "WALLPAPER": // removing wallpaper path of desktop in rc
-							case "WP":
-									try
-									{ // remove wallpaper path
-										VirtualDesktop.Desktop.FromIndex(rc).SetWallpaperPath("");
-										if (verbose) Console.WriteLine("Removed wallpaper of desktop number " + rc.ToString());
-									}
-									catch
-									{ // error while removing wallpaper
-										if (verbose) Console.WriteLine("Error removing wallpaper");
-										rc = -1;
-									}
-								break;
-
 							case "REMOVE": // remove desktop in rc
 							case "R":
 								if (verbose)
@@ -841,6 +839,19 @@ namespace VDeskTool
 								catch
 								{ // error while removing
 									Console.WriteLine();
+									rc = -1;
+								}
+								break;
+
+							case "REMOVEALL": // remove all virtual desktops but visible
+							case "RA":
+								Console.WriteLine("Removing all virtual desktops but visible");
+								try
+								{ // remove all virtual desktops but visible
+									VirtualDesktop.Desktop.RemoveAll();
+								}
+								catch
+								{ // error while removing
 									rc = -1;
 								}
 								break;
@@ -973,6 +984,20 @@ namespace VDeskTool
 									catch
 									{ // error while setting name
 										if (verbose) Console.WriteLine("Error setting wallpaper to '" + groups[2].Value + "'");
+										rc = -1;
+									}
+								break;
+
+							case "ALLWALLPAPERS": // set wallpaper path of all desktops
+							case "AWP":
+									try
+									{ // set wallpaper path of all desktops
+										VirtualDesktop.Desktop.SetAllWallpaperPaths(groups[2].Value);
+										if (verbose) Console.WriteLine("Set wallpaper path of all desktops to '" + groups[2].Value + "'");
+									}
+									catch
+									{ // error while setting name
+										if (verbose) Console.WriteLine("Error setting wallpaper path of all desktops to '" + groups[2].Value + "'");
 										rc = -1;
 									}
 								break;
@@ -2000,6 +2025,7 @@ namespace VDeskTool
 			Console.WriteLine("/Name[:<s>]      set name of desktop with number in pipeline (short: /na).");
 			Console.WriteLine("/Wallpaper[:<s>] set wallpaper path of desktop with number in pipeline (short:");
 			Console.WriteLine("                   /wp).");
+			Console.WriteLine("/AllWallpapers:<s> set wallpaper path of all desktops (short: /awp).");
 			Console.WriteLine("/IsVisible[:<n|s>] is desktop number <n>, desktop with text <s> in name or with");
 			Console.WriteLine("                   number in pipeline visible (short: /iv)? Returns 0 for");
 			Console.WriteLine("                   visible and 1 for invisible.");
@@ -2014,9 +2040,9 @@ namespace VDeskTool
 			Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
 			Console.WriteLine("/Remove[:<n|s>]  remove desktop number <n>, desktop with text <s> in name or");
 			Console.WriteLine("                   desktop with number in pipeline (short: /r).");
-			Console.WriteLine("/SwapDesktop:<n|s>  swap desktop in pipeline with desktop number <n>, desktop");
-			Console.WriteLine("                   with text <s> in name or desktop with number in pipeline");
-			Console.WriteLine("                   (short: /sd).");
+			Console.WriteLine("/RemoveAll       remove all desktops but visible (short: /ra).");
+			Console.WriteLine("/SwapDesktop:<n|s>  swap desktop in pipeline with desktop number <n> or desktop");
+			Console.WriteLine("                   with text <s> in name (short: /sd).");
 			Console.WriteLine("/MoveDesktop:<n|s>  move desktop in pipeline to desktop number <n> or desktop");
 			Console.WriteLine("                   with text <s> in name (short: /md).");
 			Console.WriteLine("/MoveWindow:<s|n>  move process with name <s> or id <n> to desktop with number");
