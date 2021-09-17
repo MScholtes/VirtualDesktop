@@ -163,25 +163,26 @@ namespace VirtualDesktop
 	[Guid("B2F925B9-5A0F-4D2E-9F4D-2B1507593C10")]
 	internal interface IVirtualDesktopManagerInternal
 	{
-		int GetCount(IntPtr hWnd);
-		void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
-		bool CanViewMoveDesktops(IApplicationView view);
-		IVirtualDesktop GetCurrentDesktop(IntPtr hWnd);
-		void GetDesktops(IntPtr hWnd, out IObjectArray desktops);
+		int GetCount(IntPtr hWndOrMon); //3
+		void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);//4
+		bool CanViewMoveDesktops(IApplicationView view);//5
+		IVirtualDesktop GetCurrentDesktop(IntPtr hWndOrMon);//6
+		IObjectArray GetAllCurrentDesktops();//7
+        void GetDesktops(IntPtr hWndOrMon, out IObjectArray desktops); //8
 		[PreserveSig]
-		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
-		void SwitchDesktop(IntPtr hWnd, IVirtualDesktop desktop);
-		IVirtualDesktop CreateDesktop(IntPtr hWnd);
-		void MoveDesktop(IVirtualDesktop desktop, IntPtr hWnd, int nIndex);
-		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
-		IVirtualDesktop FindDesktop(ref Guid desktopid);
-    void Unknown1(IVirtualDesktop desktop, out IntPtr unknown1, out IntPtr unknown2);
-		void SetName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
-		void SetWallpaperPath(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
-    void SetAllWallpaperPaths([MarshalAs(UnmanagedType.HString)] string path);
-    void Unknown2(IApplicationView pView0, IApplicationView pView1);
-    int Unknown3();
-    void RemoveAll(bool remove);
+		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop); //9
+		void SwitchDesktop(IntPtr hWndOrMon, IVirtualDesktop desktop);//10
+		IVirtualDesktop CreateDesktop(IntPtr hWndOrMon);//11
+        void MoveDesktop(IVirtualDesktop desktop, IntPtr hWndOrMon, int direction); //12
+		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);//13
+		IVirtualDesktop FindDesktop(ref Guid desktopid);//14
+        void GetDesktopSwitchIncludeExcludeViews(IVirtualDesktop desktop, out IObjectArray unknown1, out IObjectArray unknown2);//15
+		void SetDesktopName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);//16
+        void SetDesktopWallpaper(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string wallpaper);//17
+        void UpdateWallpaperPathForAllDesktops([MarshalAs(UnmanagedType.HString)] string wallpaper);//18
+        void CopyDesktopState(IApplicationView pView0, IApplicationView pView1);//19
+        int GetDesktopIsPerMonitor();//20
+        void SetDesktopIsPerMonitor(bool state);//21
 	}
 
 	[ComImport]
@@ -452,7 +453,7 @@ namespace VirtualDesktop
 		
 		public static void RemoveAll()
 		{ // remove all desktops but visible
-			DesktopManager.VirtualDesktopManagerInternal.RemoveAll(true);
+			DesktopManager.VirtualDesktopManagerInternal.SetDesktopIsPerMonitor(true);
 		}
 
 		public void Move(int index)
@@ -462,19 +463,19 @@ namespace VirtualDesktop
 
 		public void SetName(string Name)
 		{ // set name for desktop, empty string removes name
-			DesktopManager.VirtualDesktopManagerInternal.SetName(this.ivd, Name);
+			DesktopManager.VirtualDesktopManagerInternal.SetDesktopName(this.ivd, Name);
 		}
 
-		public void SetWallpaperPath(string Path)
+		public void SetDesktopWallpaper(string Path)
 		{ // set path for wallpaper, empty string removes path
 			if (string.IsNullOrEmpty(Path)) throw new ArgumentNullException();
-			DesktopManager.VirtualDesktopManagerInternal.SetWallpaperPath(this.ivd, Path);
+			DesktopManager.VirtualDesktopManagerInternal.SetDesktopWallpaper(this.ivd, Path);
 		}
 
-		public static void SetAllWallpaperPaths(string Path)
+		public static void UpdateWallpaperPathForAllDesktops(string Path)
 		{ // set wallpaper path for all desktops
 			if (string.IsNullOrEmpty(Path)) throw new ArgumentNullException();
-			DesktopManager.VirtualDesktopManagerInternal.SetAllWallpaperPaths(Path);
+			DesktopManager.VirtualDesktopManagerInternal.UpdateWallpaperPathForAllDesktops(Path);
 		}
 
 		public bool IsVisible
@@ -978,7 +979,7 @@ namespace VDeskTool
 							case "WP":
 									try
 									{ // set wallpaper path
-										VirtualDesktop.Desktop.FromIndex(rc).SetWallpaperPath(groups[2].Value);
+										VirtualDesktop.Desktop.FromIndex(rc).SetDesktopWallpaper(groups[2].Value);
 										if (verbose) Console.WriteLine("Set wallpaper of desktop number " + rc.ToString() + " to '" + VirtualDesktop.Desktop.DesktopWallpaperFromIndex(rc) + "'");
 									}
 									catch
@@ -992,7 +993,7 @@ namespace VDeskTool
 							case "AWP":
 									try
 									{ // set wallpaper path of all desktops
-										VirtualDesktop.Desktop.SetAllWallpaperPaths(groups[2].Value);
+										VirtualDesktop.Desktop.UpdateWallpaperPathForAllDesktops(groups[2].Value);
 										if (verbose) Console.WriteLine("Set wallpaper path of all desktops to '" + groups[2].Value + "'");
 									}
 									catch
@@ -2003,6 +2004,7 @@ namespace VDeskTool
 			VirtualDesktop.Desktop.FromIndex(iSwapDesktop1).SetName(desktopname2);
 			VirtualDesktop.Desktop.FromIndex(iSwapDesktop2).SetName(desktopname1);
 		}
+
 
 		static void HelpScreen()
 		{
