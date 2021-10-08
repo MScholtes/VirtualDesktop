@@ -58,7 +58,7 @@ Virtual desktop numbers start with 0.
 
 **/InsertDesktop:&lt;n|s&gt;**  insert desktop number &lt;n&gt; or desktop with text &lt;s&gt; in name before desktop in pipeline or vice versa (short: /id)(not VirtualDesktop11.exe).
 
-**/MoveDesktop:&lt;n|s&gt;**  move desktop in pipeline to desktop number <n> or desktop with text <s> in name (short: /md)(only VirtualDesktop11.exe).
+**/MoveDesktop:&lt;n|s&gt;**  move desktop in pipeline to desktop number &lt;n&gt; or desktop with text &lt;s&gt; in name (short: /md)(only VirtualDesktop11.exe).
 
 **/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
