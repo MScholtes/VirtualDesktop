@@ -1,5 +1,9 @@
 Changes:
 
+Version 1.9, 2021-10-08
+- Windows 11 version VirtualDesktop11.cs
+- fixed error in parameter parsing for texts including ':' or '='
+
 Version 1.8, 2020-12-03
 - new parameters /SwapDesktop and /InsertDesktop to rearrange desktops
 - new parameter /Calc to add to or substract from the desktop number in pipeline

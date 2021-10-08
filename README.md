@@ -1,22 +1,19 @@
 # VirtualDesktop
-C# command line tool to manage virtual desktops in Windows 10
+C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-Thanks to [NyaMisty](https://github.com/NyaMisty) there is a first version for Windows Insider 21H2 and Windows 11 Insider now. This is an **alpha version**, not all functions are tested, some are faulty, some not implemented. Getting/setting names and individual wallpapers (new parameter /WallPaper:) seem to work now, removing wallpapers lead to crashing Windows Explorers. New API functions SetAllWallpaperPaths and RemoveAll declared (parameters AllWallpapers and RemoveAll). Implemented new native function /Movedesktop: instead of homebrew /InsertDesktop:. See help screen for new parameters.
+**Version 1.9, 2021-10-08**
+- Windows 11 version VirtualDesktop11.cs
+- fixed error in parameter parsing for texts including ':' or '='
 
+(look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
-**V1.8, 2020-12-03**
-- new parameters /SwapDesktop and /InsertDesktop to rearrange desktops
-- new parameter /Calc to add to or substract from the desktop number in pipeline
-
-(look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://github.com/MScholtes/TechNet-Gallery)
-
-**With Windows 10 2004 Microsoft thankfully did not change the API (COM GUIDs) for accessing the functions for virtual desktops, but implemented two new interfaces. I provide three versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10 1809 and newer, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
+**With Windows 10 21H2 and Windows 11 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide four versions of virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11 or Windows 10 21H2, virtualdesktop.cs is for Windows 10 1809 to 21H1, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
 
 ## Generate:
-Compile with Compile.bat (no visual studio needed, but obviously Windows 10)
+Compile with Compile.bat (no visual studio needed, but obviously Windows 10 or 11)
 
 ## Description:
-Command line tool to manage the virtual desktops of Windows 10.
+Command line tool to manage the virtual desktops of Windows 10 and 11.
 Parameters can be given as a sequence of commands. The result - most of the times the number of the processed desktop - can be used as input for the next parameter. The result of the last command is returned as error level.
 Virtual desktop numbers start with 0.
 
@@ -37,6 +34,10 @@ Virtual desktop numbers start with 0.
 
 **/Name[:&lt;s&gt;]**      set name of desktop with number in pipeline (short: /na).
 
+**/Wallpaper[:&lt;s&gt;]**  set wallpaper path of desktop with number in pipeline (short: /wp)(only VirtualDesktop11.exe).
+
+**/AllWallpapers:&lt;s&gt;**  set wallpaper path of all desktops (short: /awp)(only VirtualDesktop11.exe).
+
 **/IsVisible[:&lt;n|s&gt;]**  is desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or number in pipeline visible (short: /iv)? Returns 0 for visible and 1 for invisible.
 
 **/Switch[:&lt;n|s&gt;]**    switch to desktop with number &lt;n&gt;, desktop with text &lt;s&gt; in name or with number in pipeline (short: /s).
@@ -51,9 +52,13 @@ Virtual desktop numbers start with 0.
 
 **/Remove[:&lt;n|s&gt;]**    remove desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /r).
 
+**/RemoveAll**       remove all desktops but visible (short: /ra)(only VirtualDesktop11.exe).
+
 **/SwapDesktop:&lt;n|s&gt;**  swap desktop in pipeline with desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /sd).
 
-**/InsertDesktop:&lt;n|s&gt;**  insert desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline before desktop in pipeline or vice versa (short: /id).
+**/InsertDesktop:&lt;n|s&gt;**  insert desktop number &lt;n&gt; or desktop with text &lt;s&gt; in name before desktop in pipeline or vice versa (short: /id)(not VirtualDesktop11.exe).
+
+**/MoveDesktop:&lt;n|s&gt;**  move desktop in pipeline to desktop number <n> or desktop with text <s> in name (short: /md)(only VirtualDesktop11.exe).
 
 **/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
@@ -116,9 +121,6 @@ VirtualDesktop.exe -IsWindowPinned:cmd
 if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
 
 Virtualdesktop.exe -GetDesktop:1 "-MoveWindowHandle:note^^pad"
-
-REM Insert desktop 7 before deskto p5
-VirtualDesktop.exe /GetDesktop:7 /InsertDesktop:5
 
 for /f "tokens=4 delims= " %i in ('VirtualDesktop.exe c') do @set DesktopCount=%i
 echo Count of desktops is %DesktopCount%

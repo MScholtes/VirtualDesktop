@@ -1,5 +1,5 @@
-// Author: Markus Scholtes, 2020
-// Version 1.8, 2020-12-03
+// Author: Markus Scholtes, 2021
+// Version 1.9, 2021-10-08
 // Version for Windows 10 1803
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1803.cs
@@ -16,11 +16,11 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2020")]
+[assembly:AssemblyCopyright("© Markus Scholtes 2021")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.7.0.0")]
-[assembly:AssemblyFileVersion("1.7.0.0")]
+[assembly:AssemblyVersion("1.9.0.0")]
+[assembly:AssemblyFileVersion("1.9.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -559,7 +559,7 @@ namespace VDeskTool
 
 			foreach (string arg in args)
 			{
-				System.Text.RegularExpressions.GroupCollection groups = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?([^:=]*)$").Groups;
+				System.Text.RegularExpressions.GroupCollection groups = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?(.*)$").Groups;
 
 				if (groups.Count != 3)
 				{ // parameter error
@@ -648,7 +648,7 @@ namespace VDeskTool
 							case "ISVISIBLE": // is desktop in rc visible?
 							case "IV":
 								if ((rc >= 0) && (rc < VirtualDesktop.Desktop.Count))
-								{ // check if parameter is 0 and in range of active desktops
+								{ // check if parameter is in range of active desktops
 									if (VirtualDesktop.Desktop.FromIndex(rc).IsVisible)
 									{
 										if (verbose) Console.WriteLine("Virtual desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "' (desktop number " + rc.ToString() + ") is visible");
@@ -787,7 +787,7 @@ namespace VDeskTool
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count))
-									{ // check if parameter is 0 and in range of active desktops
+									{ // check if parameter is in range of active desktops
 										if (verbose) Console.WriteLine("Virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "') selected");
 										rc = iParam;
 									}
@@ -815,7 +815,7 @@ namespace VDeskTool
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count))
-									{ // check if parameter is 0 and in range of active desktops
+									{ // check if parameter is in range of active desktops
 										if (VirtualDesktop.Desktop.FromIndex(iParam).IsVisible)
 										{
 											if (verbose) Console.WriteLine("Virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "') is visible");
@@ -859,7 +859,7 @@ namespace VDeskTool
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count))
-									{ // check if parameter is 0 and in range of active desktops
+									{ // check if parameter is in range of active desktops
 										if (verbose) Console.WriteLine("Switching to virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "')");
 										rc = iParam;
 										try
@@ -903,7 +903,7 @@ namespace VDeskTool
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count))
-									{ // check if parameter is 0 and in range of active desktops
+									{ // check if parameter is in range of active desktops
 										if (verbose) Console.WriteLine("Removing virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "')");
 										rc = iParam;
 										try
@@ -947,7 +947,7 @@ namespace VDeskTool
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count) && (rc != iParam))
-									{ // check if parameter is 0 and in range of active desktops
+									{ // check if parameter is in range of active desktops
 										if (verbose) Console.WriteLine("Swapping virtual desktops number " + rc.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') and number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "')");
 										try
 										{ // swap virtual desktops rc and iParam
@@ -998,7 +998,7 @@ namespace VDeskTool
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // parameter is an integer, use as desktop number
 									if ((iParam >= 0) && (iParam < VirtualDesktop.Desktop.Count) && (rc != iParam))
-									{ // check if parameter is 0 and in range of active desktops
+									{ // check if parameter is in range of active desktops
 										if (verbose) Console.WriteLine("Inserting virtual desktop number " + iParam.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(iParam) + "') before desktop number " + rc.ToString() + " (desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') or vice versa");
 										try
 										{ // insert virtual desktop iParam before rc
@@ -1890,7 +1890,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2020, v1.8\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2021, v1.9\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
@@ -1920,12 +1920,10 @@ namespace VDeskTool
 			Console.WriteLine("/New             create new desktop (short: /n). Number is stored in pipeline.");
 			Console.WriteLine("/Remove[:<n|s>]  remove desktop number <n>, desktop with text <s> in name or");
 			Console.WriteLine("                   desktop with number in pipeline (short: /r).");
-			Console.WriteLine("/SwapDesktop:<n|s>  swap desktop in pipeline with desktop number <n>, desktop");
-			Console.WriteLine("                   with text <s> in name or desktop with number in pipeline");
-			Console.WriteLine("                   (short: /sd).");
-			Console.WriteLine("/InsertDesktop:<n|s>  insert desktop number <n>, desktop with text <s> in name");
-			Console.WriteLine("                   or desktop with number in pipeline before desktop in");
-			Console.WriteLine("                   pipeline or vice versa (short: /id).");
+			Console.WriteLine("/SwapDesktop:<n|s>  swap desktop in pipeline with desktop number <n> or desktop");
+			Console.WriteLine("                   with text <s> in name (short: /sd).");
+			Console.WriteLine("/InsertDesktop:<n|s>  insert desktop number <n> or desktop with text <s> in");
+			Console.WriteLine("                   name before desktop in pipeline or vice versa (short: /id).");
 			Console.WriteLine("/MoveWindow:<s|n>  move process with name <s> or id <n> to desktop with number");
 			Console.WriteLine("                   in pipeline (short: /mw).");
 			Console.WriteLine("/MoveWindowHandle:<s|n>  move window with text <s> in title or handle <n> to");
