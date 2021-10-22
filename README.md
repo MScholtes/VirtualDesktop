@@ -5,7 +5,7 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 - Windows 11 version VirtualDesktop11.cs
 - fixed error in parameter parsing for texts including ':' or '='
 
-(look for a powershell version here: https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5 or here: https://www.powershellgallery.com/packages/VirtualDesktop)
+(look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
 **With Windows 10 21H2 and Windows 11 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide four versions of virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11 or Windows 10 21H2, virtualdesktop.cs is for Windows 10 1809 to 21H1, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables  will be generated (thanks to [mzomparelli](https://github.com/mzomparelli/zVirtualDesktop/wiki) for investigating).**
 
