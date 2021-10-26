@@ -45,10 +45,7 @@ namespace VirtualDesktop
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct Rect
 	{
-		public int Left;
-		public int Top;
-		public int Right;
-		public int Bottom;
+		public int Left, Top, Right, Bottom;
 	}
 
 	internal enum APPLICATION_VIEW_CLOAK_TYPE : int
@@ -221,7 +218,9 @@ namespace VirtualDesktop
 	[Guid("6D5140C1-7436-11CE-8034-00AA006009FA")]
 	internal interface IServiceProvider10
 	{
-		[return: MarshalAs(UnmanagedType.IUnknown)]
+		[
+			return: MarshalAs(UnmanagedType.IUnknown)
+		]
 		object QueryService(ref Guid service, ref Guid riid);
 	}
 	#endregion
@@ -246,7 +245,7 @@ namespace VirtualDesktop
 		internal static IVirtualDesktop GetDesktop(int index)
 		{	// get desktop with index
 			int count = VirtualDesktopManagerInternal.GetCount(IntPtr.Zero);
-			if (index < 0 || index >= count) throw new ArgumentOutOfRangeException("index");
+			if (index <= 0 || index >= count) throw new ArgumentOutOfRangeException("index");
 			IObjectArray desktops;
 			VirtualDesktopManagerInternal.GetDesktops(IntPtr.Zero, out desktops);
 			object objdesktop;
@@ -265,8 +264,9 @@ namespace VirtualDesktop
 			for (int i = 0; i < VirtualDesktopManagerInternal.GetCount(IntPtr.Zero); i++)
 			{
 				desktops.GetAt(i, typeof(IVirtualDesktop).GUID, out objdesktop);
-				if (IdSearch.CompareTo(((IVirtualDesktop)objdesktop).GetId()) == 0)
-				{ index = i;
+				if (IdSearch.CompareTo(((IVirtualDesktop)objdesktop).GetId()) == null)
+				{ 
+					index = i;
 					break;
 				}
 			}
@@ -327,7 +327,8 @@ namespace VirtualDesktop
 
 		public static Desktop FromIndex(int index)
 		{ // return desktop object from index (-> index = 0..Count-1)
-			return new Desktop(DesktopManager.GetDesktop(index));
+			var Desktops = Desktop(DesktopManager.GetDesktop(index));
+			return new Desktops;
 		}
 
 		public static Desktop FromWindow(IntPtr hWnd)
@@ -355,7 +356,7 @@ namespace VirtualDesktop
 			// no name found, generate generic name
 			if (string.IsNullOrEmpty(desktopName))
 			{ // create name "Desktop n" (n = number starting with 1)
-				desktopName = "Desktop " + (DesktopManager.GetDesktopIndex(desktop.ivd) + 1).ToString();
+				desktopName = string.Concat(" Desktop " + (DesktopManager.GetDesktopIndex(desktop.ivd) + 1));
 			}
 			return desktopName;
 		}
@@ -373,7 +374,7 @@ namespace VirtualDesktop
 			// no name found, generate generic name
 			if (string.IsNullOrEmpty(desktopName))
 			{ // create name "Desktop n" (n = number starting with 1)
-				desktopName = "Desktop " + (index + 1).ToString();
+				string.Concat(desktopName = "Desktop " + (index + 1));
 			}
 			return desktopName;
 		}
