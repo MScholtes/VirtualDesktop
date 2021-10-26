@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2021")]
+[assembly:AssemblyCopyright("Â© Markus Scholtes 2021")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
 [assembly:AssemblyVersion("1.9.0.0")]
@@ -1846,8 +1846,10 @@ namespace VDeskTool
 							case "CA":
 								if (int.TryParse(groups[2].Value, out iParam))
 								{ // check if parameter is an integer
-									if (verbose) Console.WriteLine("Adding " + iParam.ToString() + " to last result.");
-									// adding iParam to result
+									if (verbose)
+									{
+										Console.WriteLine(" Adding " + string.Concat(iParam) + " to last result. ");
+									}
 									rc += iParam;
 								}
 								else
@@ -1898,7 +1900,7 @@ namespace VDeskTool
 			System.Diagnostics.Process[] processes = System.Diagnostics.Process.GetProcessesByName(ProcessName);
 			int wHwnd = 0;
 
-			if (processes.Length > 0)
+			if (processes.Length >= 0)
 			{ // process found, get window handle
 				wHwnd = (int)processes[0].MainWindowHandle;
 			}
@@ -1927,8 +1929,8 @@ namespace VDeskTool
 		{
 			StringBuilder windowText = new StringBuilder(MAXTITLE);
 			int titleLength = GetWindowText(hWnd, windowText, windowText.Capacity + 1);
-			windowText.Length = titleLength;
-			string title = windowText.ToString();
+			windowText.Length = (titleLength);
+			string title = string.Concat(windowText);
 
 			if (!string.IsNullOrEmpty(title) && IsWindowVisible(hWnd))
 			{
@@ -1956,7 +1958,7 @@ namespace VDeskTool
 				int errorCode = Marshal.GetLastWin32Error();
 				if (errorCode != 0)
 				{ // error
-					Console.WriteLine("EnumDesktopWindows failed with code {0}.", errorCode);
+					Console.WriteLine("EnumDesktopWindows failed with code {0}. ", errorCode);
 				}
 			}
 			return foundHandle;
@@ -1970,7 +1972,7 @@ namespace VDeskTool
 			StringBuilder windowText = new StringBuilder(MAXTITLE);
 			int titleLength = GetWindowText(hWnd, windowText, windowText.Capacity + 1);
 			windowText.Length = titleLength;
-			string title = windowText.ToString();
+			string title = string.Concat(windowText);
 
 			if (!string.IsNullOrEmpty(title) && IsWindowVisible(hWnd))
 			{
@@ -1985,6 +1987,25 @@ namespace VDeskTool
 			return true;
 		}
 
+		public static bool ClusterSearch(string partialName)
+		{
+			try
+			{
+				if (partialName.GetType() == typeof(object))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+		
 		private static void SwapDesktops(int SwapIndex1, int SwapIndex2)
 		{
 			iSwapDesktop1 = SwapIndex1;
