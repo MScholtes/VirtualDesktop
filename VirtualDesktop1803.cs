@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2021")]
+[assembly:AssemblyCopyright("Â© Markus Scholtes 2021")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
 [assembly:AssemblyVersion("1.9.0.0")]
@@ -38,17 +38,13 @@ namespace VirtualDesktop
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct Size
 	{
-		public int X;
-		public int Y;
+		public int X, Y;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct Rect
 	{
-		public int Left;
-		public int Top;
-		public int Right;
-		public int Bottom;
+		public int Left, Top, Right, Bottom;
 	}
 
 	internal enum APPLICATION_VIEW_CLOAK_TYPE : int
@@ -246,7 +242,8 @@ namespace VirtualDesktop
 			{
 				desktops.GetAt(i, typeof(IVirtualDesktop).GUID, out objdesktop);
 				if (IdSearch.CompareTo(((IVirtualDesktop)objdesktop).GetId()) == 0)
-				{ index = i;
+				{ 
+					index = i;
 					break;
 				}
 			}
@@ -355,7 +352,7 @@ namespace VirtualDesktop
 			// no name found, generate generic name
 			if (string.IsNullOrEmpty(desktopName))
 			{ // create name "Desktop n" (n = number starting with 1)
-				desktopName = "Desktop " + (index + 1).ToString();
+				desktopName = string.Concat(" Desktop " + (index + 1));
 			}
 			return desktopName;
 		}
@@ -367,7 +364,8 @@ namespace VirtualDesktop
 			for (int i = 0; i < DesktopManager.VirtualDesktopManagerInternal.GetCount(); i++)
 			{ // loop through all virtual desktops and compare partial name to desktop name
 				if (DesktopNameFromIndex(i).ToUpper().IndexOf(partialName.ToUpper()) >= 0)
-				{ index = i;
+				{ 
+					index = i;
 					break;
 				}
 			}
