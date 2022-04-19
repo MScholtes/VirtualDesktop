@@ -3,9 +3,8 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
 **Released temporary version VirtualDesktop11Insider.cs with support for Windows 11 Insider Dev Channel (version 22489 and I hope newer versions)! Only basic functions tested!**
 
-**Version 1.9, 2021-10-08**
-- Windows 11 version VirtualDesktop11.cs
-- fixed error in parameter parsing for texts including ':' or '='
+**Version 1.9c, 2021-10-08**
+- Windows Server 2022 version VirtualDesktopServer2022.cs
 
 (look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
