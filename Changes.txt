@@ -1,5 +1,11 @@
 Changes:
 
+Version 1.9c, 2022-04-19
+- Windows Server 2022 version VirtualDesktopServer2022.cs
+
+Version 1.9b, 2021-11-13
+- temporary version VirtualDesktop11Insider.cs with support for Windows 11 Insider Dev Channel (version 22489 and I hope newer versions)
+
 Version 1.9, 2021-10-08
 - Windows 11 version VirtualDesktop11.cs
 - fixed error in parameter parsing for texts including ':' or '='
