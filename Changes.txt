@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.10, 2022-07-29
+- bug fix: desktop for pinned windows and apps are recognized
+
 Version 1.9c, 2022-04-19
 - Windows Server 2022 version VirtualDesktopServer2022.cs
 

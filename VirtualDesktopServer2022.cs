@@ -1,5 +1,5 @@
-// Author: Markus Scholtes, 2021
-// Version 1.9, 2021-10-08
+// Author: Markus Scholtes, 2022
+// Version 1.10, 2022-07-29
 // Version for Windows Server 2022
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -16,11 +16,11 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2021")]
+[assembly:AssemblyCopyright("© Markus Scholtes 2022")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.9.0.0")]
-[assembly:AssemblyFileVersion("1.9.0.0")]
+[assembly:AssemblyVersion("1.10.0.0")]
+[assembly:AssemblyFileVersion("1.10.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -314,6 +314,9 @@ Console.WriteLine("Name of desktop: " + desktopName);
 		[DllImport("user32.dll")]
 		private static extern IntPtr GetForegroundWindow();
 
+		private static readonly Guid AppOnAllDesktops = new Guid("BB64D5B7-4DE3-4AB2-A87C-DB7601AEA7DC");
+		private static readonly Guid WindowOnAllDesktops = new Guid("C2DDEA68-66F2-4CF9-8264-1BFD00FBBBAC");
+
 		private IVirtualDesktop ivd;
 		private Desktop(IVirtualDesktop desktop) { this.ivd = desktop; }
 
@@ -347,7 +350,10 @@ Console.WriteLine("Name of desktop: " + desktopName);
 		{ // return desktop object to desktop on which window <hWnd> is displayed
 			if (hWnd == IntPtr.Zero) throw new ArgumentNullException();
 			Guid id = DesktopManager.VirtualDesktopManager.GetWindowDesktopId(hWnd);
-			return new Desktop(DesktopManager.VirtualDesktopManagerInternal.FindDesktop(ref id));
+			if ((id.CompareTo(AppOnAllDesktops) == 0) || (id.CompareTo(WindowOnAllDesktops) == 0))
+				return new Desktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop(IntPtr.Zero));
+			else
+				return new Desktop(DesktopManager.VirtualDesktopManagerInternal.FindDesktop(ref id));
 		}
 
 		public static int FromDesktop(Desktop desktop)
@@ -536,7 +542,11 @@ Console.WriteLine("Name of desktop: " + desktopName);
 		public bool HasWindow(IntPtr hWnd)
 		{ // return true if window is on this desktop
 			if (hWnd == IntPtr.Zero) throw new ArgumentNullException();
-			return ivd.GetId() == DesktopManager.VirtualDesktopManager.GetWindowDesktopId(hWnd);
+			Guid id = DesktopManager.VirtualDesktopManager.GetWindowDesktopId(hWnd);
+			if ((id.CompareTo(AppOnAllDesktops) == 0) || (id.CompareTo(WindowOnAllDesktops) == 0))
+				return true;
+			else
+				return ivd.GetId() == id;
 		}
 
 		public static bool IsWindowPinned(IntPtr hWnd)
@@ -1999,9 +2009,9 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2021, v1.9\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2022, v1.10\n");
 
-			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 10.");
+			Console.WriteLine("Command line tool to manage the virtual desktops of Windows Server 2022.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
 			Console.WriteLine("times the number of the processed desktop - can be used as input for the next");
 			Console.WriteLine("parameter. The result of the last command is returned as error level.");
