@@ -22,15 +22,13 @@ jobs:
         tagRegex: "v(.*)"
         tagRegexGroup: 1
     - uses: actions/checkout@v3
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
     - name: Compile
       shell: bash
       run:
          |
         for FILE in *.cs
         do
-            csc.exe "$FILE" /win32icon:"MScholtes.ico"
+            /c/Windows/Microsoft.NET/Framework/v4.0.30319/csc.exe "$FILE" /win32icon:"MScholtes.ico"
         done
     - name: Get release tag (tagged)
       if: startsWith(github.ref, 'refs/tags/')
