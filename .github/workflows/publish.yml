@@ -1,25 +1,27 @@
-name: .NET
+name: Publish
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - v*
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    - name: Compile
+      shell: bash
+      run:
+         |
+        for FILE in *.cs
+        do
+            csc.exe "$FILE" /win32icon:"MScholtes.ico"
+        done
+    - name: Release
+      uses: softprops/action-gh-release@v1
       with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+        files: "*.exe" 
