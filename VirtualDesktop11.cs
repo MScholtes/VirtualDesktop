@@ -1,6 +1,6 @@
 // Author: Markus Scholtes, 2022
-// Version 1.10, 2022-07-29
-// Version for Windows 11
+// Version 1.11, 2022-11-13
+// Version for Windows 11 22H2
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11.cs
 
@@ -19,8 +19,8 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2022")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.10.0.0")]
-[assembly:AssemblyFileVersion("1.10.0.0")]
+[assembly:AssemblyVersion("1.11.0.0")]
+[assembly:AssemblyFileVersion("1.11.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -167,6 +167,7 @@ namespace VirtualDesktop
 		void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
 		bool CanViewMoveDesktops(IApplicationView view);
 		IVirtualDesktop GetCurrentDesktop(IntPtr hWndOrMon);
+		IObjectArray GetAllCurrentDesktops();
 		void GetDesktops(IntPtr hWndOrMon, out IObjectArray desktops);
 		[PreserveSig]
 		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
@@ -455,7 +456,7 @@ namespace VirtualDesktop
 
 			DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(ivd, fallbackdesktop);
 		}
-		
+
 		public static void RemoveAll()
 		{ // remove all desktops but visible
 			DesktopManager.VirtualDesktopManagerInternal.SetDesktopIsPerMonitor(true);
@@ -2016,7 +2017,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2022, v1.10\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2022, v1.11\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 11.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");

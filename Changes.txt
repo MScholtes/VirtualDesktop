@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.11, 2022-11-13
+- renaming for Windows 11 22H2
+
 Version 1.10, 2022-07-29
 - bug fix: desktop for pinned windows and apps are recognized
 
