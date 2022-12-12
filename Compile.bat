@@ -9,6 +9,7 @@ C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop.cs" /
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktopServer2022.cs" /win32icon:"%~dp0MScholtes.ico"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop1803.cs" /win32icon:"%~dp0MScholtes.ico"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop1607.cs" /win32icon:"%~dp0MScholtes.ico"
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktopInsider.cs" /win32icon:"%~dp0MScholtes.ico"
 
 :: was batch started in Windows Explorer? Yes, then pause
 echo "%CMDCMDLINE%" | find /i "/c" > nul

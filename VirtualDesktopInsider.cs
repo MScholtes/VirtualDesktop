@@ -1,8 +1,8 @@
 // Author: Markus Scholtes, 2022
 // Version 1.11, 2022-11-13
-// Version for Windows 11 22H2
+// Version for Windows 11 Insider 25158+
 // Compile with:
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11.cs
+// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktopInsider.cs
 
 using System;
 using System.Runtime.InteropServices;
@@ -160,7 +160,7 @@ namespace VirtualDesktop
 
 	[ComImport]
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	[Guid("B2F925B9-5A0F-4D2E-9F4D-2B1507593C10")]
+	[Guid("88846798-1611-4D18-946B-4A67BFF58C1B")]
 	internal interface IVirtualDesktopManagerInternal
 	{
 		int GetCount(IntPtr hWndOrMon);
