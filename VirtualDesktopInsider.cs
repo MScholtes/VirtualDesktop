@@ -1,6 +1,6 @@
-// Author: Markus Scholtes, 2022
-// Version 1.11, 2022-11-13
-// Version for Windows 11 Insider 25158+
+// Author: Markus Scholtes, 2023
+// Version 1.11, 2023-02-14
+// Version for Windows 11 Insider 25276+
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktopInsider.cs
 
@@ -172,17 +172,18 @@ namespace VirtualDesktop
 		[PreserveSig]
 		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
 		void SwitchDesktop(IntPtr hWndOrMon, IVirtualDesktop desktop);
+		void SwitchDesktopAndMoveForegroundView(IntPtr hWndOrMon, IVirtualDesktop desktop);
 		IVirtualDesktop CreateDesktop(IntPtr hWndOrMon);
 		void MoveDesktop(IVirtualDesktop desktop, IntPtr hWndOrMon, int nIndex);
 		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
 		IVirtualDesktop FindDesktop(ref Guid desktopid);
-    void GetDesktopSwitchIncludeExcludeViews(IVirtualDesktop desktop, out IObjectArray unknown1, out IObjectArray unknown2);
+		void GetDesktopSwitchIncludeExcludeViews(IVirtualDesktop desktop, out IObjectArray unknown1, out IObjectArray unknown2);
 		void SetDesktopName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
 		void SetDesktopWallpaper(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
-    void UpdateWallpaperPathForAllDesktops([MarshalAs(UnmanagedType.HString)] string path);
-    void CopyDesktopState(IApplicationView pView0, IApplicationView pView1);
-    int GetDesktopIsPerMonitor();
-    void SetDesktopIsPerMonitor(bool state);
+		void UpdateWallpaperPathForAllDesktops([MarshalAs(UnmanagedType.HString)] string path);
+		void CopyDesktopState(IApplicationView pView0, IApplicationView pView1);
+		int GetDesktopIsPerMonitor();
+		void SetDesktopIsPerMonitor(bool state);
 	}
 
 	[ComImport]
