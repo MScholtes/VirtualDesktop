@@ -135,7 +135,7 @@ Virtualdesktop.exe /Count /Calc:-1 /Switch
 VirtualDesktop.exe -IsWindowPinned:cmd
 if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
 
-Virtualdesktop.exe -GetDesktop:\*last\* "-MoveWindowHandle:note^^pad"
+Virtualdesktop.exe -GetDesktop:*last* "-MoveWindowHandle:note^^pad"
 
 for /f "tokens=4 delims= " %i in ('VirtualDesktop.exe c') do @set DesktopCount=%i
 echo Count of desktops is %DesktopCount%
