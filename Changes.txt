@@ -1,5 +1,13 @@
 Changes:
 
+Version 1.12, 2023-03-10
+- new parameter /ListWindowsOnDesktop - list handles of windows on desktop
+- new parameter /MoveWindowsToDesktop - move windows on desktop to another desktop
+- new parameter /CloseWindowsOnDesktop -  close windows on desktop
+- instead of a desktop name you can use LAST or *LAST* to select the last virtual desktop
+- renamed version for Windows 10 1607 to Windows Server 2016
+- removed version for Windows 10 1803
+
 Version 1.11, 2022-11-13
 - renaming for Windows 11 22H2
 

@@ -4,11 +4,17 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 **With Windows 11 Insider version again thanks to [NyaMisti](https://github.com/NyaMisty)!**
 
 **Version 1.11, 2022-11-13**
-- renaming for Windows 11 22H2
+**Version 1.12, 2023-03-10**
+- new parameter /ListWindowsOnDesktop - list handles of windows on desktop
+- new parameter /MoveWindowsToDesktop - move windows on desktop to another desktop
+- new parameter /CloseWindowsOnDesktop -  close windows on desktop
+- instead of a desktop name you can use LAST or \*LAST\* to select the last virtual desktop
+- renamed version for Windows 10 1607 to Windows Server 2016
+- removed version for Windows 10 1803
 
 (look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
-**With Windows 11 22H2 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide six versions of virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11, virtualdesktop11-21h2.cs for Windows 11 21H2, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktop.cs is for Windows 10 1809 to 22H2, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables will be generated.**
+**With Windows 11 22H2 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide six versions of virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11, virtualdesktop11-21h2.cs for Windows 11 21H2, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktop.cs is for Windows 10 1809 to 21H2, virtualdesktop1803.cs is for Windows 10 1803, virtualdesktop1607.cs is for Windows 10 1607 to 1709 and Windows Server 2016. Using Compile.bat all executables will be generated.**
 
 ## Generate:
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10 or 11)
@@ -61,6 +67,8 @@ Virtual desktop numbers start with 0.
 
 **/MoveDesktop:&lt;n|s&gt;**  move desktop in pipeline to desktop number &lt;n&gt; or desktop with text &lt;s&gt; in name (short: /md)(only VirtualDesktop11.exe).
 
+**/MoveWindowsToDesktop::&lt;n|s&gt;**  move windows on desktop in pipeline to desktop number &lt;n&gt; or desktop with text &lt;s&gt; in name (short: /mwtd).
+
 **/MoveWindow:&lt;s|n&gt;**  move process with name &lt;s&gt; or id &lt;n&gt; to desktop with number in pipeline (short: /mw).
 
 **/MoveWindowHandle:&lt;s|n&gt;**  move window with text &lt;s&gt; in title or handle &lt;n&gt; to desktop with number in pipeline (short: /mwh).
@@ -74,6 +82,10 @@ Virtual desktop numbers start with 0.
 **/IsWindowOnDesktop:&lt;s|n&gt;**  check if process with name &lt;s&gt; or id &lt;n&gt; is on desktop with number in pipeline (short: /iwod). Returns 0 for yes, 1 for no.
 
 **/IsWindowHandleOnDesktop:&lt;s|n&gt;**  check if window with text &lt;s&gt; in title or handle &lt;n&gt; is on desktop with number in pipeline (short: /iwhod). Returns 0 for yes, 1 for no.
+
+**/ListWindowsOnDesktop[:&lt;n|s&gt;]**  list handles of windows on desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /lwod).
+
+**/CloseWindowsOnDesktop[:&lt;n|s&gt;]**  close windows on desktop number &lt;n&gt;, desktop with text &lt;n&gt; in name or desktop with number in pipeline (short: /cwod).
 
 **/PinWindow:&lt;s|n&gt;**   pin process with name &lt;s&gt; or id &lt;n&gt; to all desktops (short: /pw).
 
@@ -99,6 +111,9 @@ Virtual desktop numbers start with 0.
 
 **/Sleep:&lt;n&gt;**     wait for &lt;n&gt; milliseconds (short: /sl).
 
+##Hint:
+Instead of a desktop name you can use LAST or \*LAST\* to select the last virtual desktop.
+
 ## Hint:
 Insert ^^ somewhere in window title parameters to prevent finding the own window. ^ is removed before searching window titles.
 
@@ -121,7 +136,7 @@ Virtualdesktop.exe /Count /Calc:-1 /Switch
 VirtualDesktop.exe -IsWindowPinned:cmd
 if ERRORLEVEL 1 VirtualDesktop.exe PinWindow:cmd
 
-Virtualdesktop.exe -GetDesktop:1 "-MoveWindowHandle:note^^pad"
+Virtualdesktop.exe -GetDesktop:\*last\* "-MoveWindowHandle:note^^pad"
 
 for /f "tokens=4 delims= " %i in ('VirtualDesktop.exe c') do @set DesktopCount=%i
 echo Count of desktops is %DesktopCount%
