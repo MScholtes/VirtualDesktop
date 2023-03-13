@@ -111,10 +111,9 @@ Virtual desktop numbers start with 0.
 
 **/Sleep:&lt;n&gt;**     wait for &lt;n&gt; milliseconds (short: /sl).
 
-##Hint:
+##Hints:
 Instead of a desktop name you can use LAST or \*LAST\* to select the last virtual desktop.
 
-## Hint:
 Insert ^^ somewhere in window title parameters to prevent finding the own window. ^ is removed before searching window titles.
 
 ## Examples:
