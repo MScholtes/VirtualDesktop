@@ -1,9 +1,8 @@
 # VirtualDesktop
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-**With Windows 11 Insider version again thanks to [NyaMisti](https://github.com/NyaMisty)!**
+**Pre-compiled binaries in Releases now**
 
-**Version 1.11, 2022-11-13**
 **Version 1.12, 2023-03-10**
 - new parameter /ListWindowsOnDesktop - list handles of windows on desktop
 - new parameter /MoveWindowsToDesktop - move windows on desktop to another desktop
