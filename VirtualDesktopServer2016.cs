@@ -1,11 +1,12 @@
 // Author: Markus Scholtes, 2023
-// Version 1.12, 2023-03-10
+// Version 1.13, 2023-06-25
 // Version for Windows 10 1607 to 1709 or Windows Server 2016
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1607.cs
 
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
@@ -269,15 +270,38 @@ namespace VirtualDesktop
 	#endregion
 
 	#region public interface
+	public class WindowInformation
+	{ // stores window informations
+		public string Title { get; set; }
+		public int Handle { get; set; }
+	}
+
 	public class Desktop
 	{
 		// get process id to window handle
 		[DllImport("user32.dll")]
-		private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+		private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+
+		// get thread id of current process
+		[DllImport("kernel32.dll")]
+		static extern uint GetCurrentThreadId();
+
+		// attach input to thread
+		[DllImport("user32.dll")]
+		static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
 
 		// get handle of active window
 		[DllImport("user32.dll")]
 		private static extern IntPtr GetForegroundWindow();
+
+		// try to set foreground window
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		// send message to window
+		[DllImport("user32.dll")]
+		static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+		private const int SW_MINIMIZE = 6;
 
 		private static readonly Guid AppOnAllDesktops = new Guid("BB64D5B7-4DE3-4AB2-A87C-DB7601AEA7DC");
 		private static readonly Guid WindowOnAllDesktops = new Guid("C2DDEA68-66F2-4CF9-8264-1BFD00FBBBAC");
@@ -413,7 +437,27 @@ namespace VirtualDesktop
 
 		public void MakeVisible()
 		{ // make this desktop visible
+			WindowInformation wi = FindWindow("Program Manager");
+
+			// activate desktop to prevent flashing icons in taskbar
+			int dummy;
+			uint DesktopThreadId = GetWindowThreadProcessId(new IntPtr(wi.Handle), out dummy);
+			uint ForegroundThreadId = GetWindowThreadProcessId(GetForegroundWindow(), out dummy);
+			uint CurrentThreadId = GetCurrentThreadId();
+
+			if ((DesktopThreadId != 0) && (ForegroundThreadId != 0) && (ForegroundThreadId != CurrentThreadId))
+			{
+				AttachThreadInput(DesktopThreadId, CurrentThreadId, true);
+				AttachThreadInput(ForegroundThreadId, CurrentThreadId, true);
+				SetForegroundWindow(new IntPtr(wi.Handle));
+				AttachThreadInput(ForegroundThreadId, CurrentThreadId, false);
+				AttachThreadInput(DesktopThreadId, CurrentThreadId, false);
+			}
+
 			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(ivd);
+
+			// direct desktop to give away focus
+			ShowWindow(new IntPtr(wi.Handle), SW_MINIMIZE);
 		}
 
 		public Desktop Left
@@ -542,6 +586,55 @@ namespace VirtualDesktop
 			{ // unpin only if pinned
 				DesktopManager.VirtualDesktopPinnedApps.UnpinAppID(appId);
 			}
+		}
+
+		// prepare callback function for window enumeration
+		private delegate bool CallBackPtr(int hwnd, int lParam);
+		private static CallBackPtr callBackPtr = Callback;
+		// list of window informations
+		private static List<WindowInformation> WindowInformationList = new List<WindowInformation>();
+
+		// enumerate windows
+		[DllImport("User32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool EnumWindows(CallBackPtr lpEnumFunc, IntPtr lParam);
+
+		// get window title length
+		[DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern int GetWindowTextLength(IntPtr hWnd);
+
+		// get window title
+		[DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+		// callback function for window enumeration
+		private static bool Callback(int hWnd, int lparam)
+		{
+			int length = GetWindowTextLength((IntPtr)hWnd);
+			if (length > 0)
+			{
+				StringBuilder sb = new StringBuilder(length + 1);
+				if (GetWindowText((IntPtr)hWnd, sb, sb.Capacity) > 0)
+				{ WindowInformationList.Add(new WindowInformation {Handle = hWnd, Title = sb.ToString()}); }
+			}
+			return true;
+		}
+
+		// get list of all windows with title
+		public static List<WindowInformation> GetWindows()
+		{
+			WindowInformationList = new List<WindowInformation>();
+			EnumWindows(callBackPtr, IntPtr.Zero);
+			return WindowInformationList;
+		}
+
+		// find first window with string in title
+		public static WindowInformation FindWindow(string WindowTitle)
+		{
+			WindowInformationList = new List<WindowInformation>();
+			EnumWindows(callBackPtr, IntPtr.Zero);
+			WindowInformation result = WindowInformationList.Find(x => x.Title.IndexOf(WindowTitle, StringComparison.OrdinalIgnoreCase) >= 0);
+			return result;
 		}
 	}
 	#endregion
@@ -2315,7 +2408,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2023, v1.12\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2023, v1.13\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows Server 2016.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");

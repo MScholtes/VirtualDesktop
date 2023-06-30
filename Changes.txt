@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.13, 2023-06-25
+- no flashing icons after switching desktops (nearly always)
+
 Version 1.12, 2023-03-10
 - new parameter /ListWindowsOnDesktop - list handles of windows on desktop
 - new parameter /MoveWindowsToDesktop - move windows on desktop to another desktop

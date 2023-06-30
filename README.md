@@ -3,13 +3,8 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
 **Pre-compiled binaries in Releases now**
 
-**Version 1.12, 2023-03-10**
-- new parameter /ListWindowsOnDesktop - list handles of windows on desktop
-- new parameter /MoveWindowsToDesktop - move windows on desktop to another desktop
-- new parameter /CloseWindowsOnDesktop -  close windows on desktop
-- instead of a desktop name you can use LAST or \*LAST\* to select the last virtual desktop
-- renamed version for Windows 10 1607 to Windows Server 2016
-- removed version for Windows 10 1803
+**Version 1.13, 2023-06-25**
+- no flashing icons after switching desktops (nearly always)
 
 (look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
