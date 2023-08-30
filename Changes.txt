@@ -1,5 +1,9 @@
 Changes:
 
+Version 1.14, 2023-08-29
+- version for Windows 11 22H2.2215 and up called VirtualDesktop11-23H2.cs
+- removed VirtualDesktopInsider.cs
+
 Version 1.13, 2023-06-25
 - no flashing icons after switching desktops (nearly always)
 
