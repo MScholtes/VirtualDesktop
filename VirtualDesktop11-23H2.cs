@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2023
-// Version 1.14, 2023-08-29
+// Version 1.15, 2023-08-29
 // Version for Windows 11 22H2.2215 and up
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11-23H2.cs
@@ -20,8 +20,8 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2023")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.14.0.0")]
-[assembly:AssemblyFileVersion("1.14.0.0")]
+[assembly:AssemblyVersion("1.15.0.0")]
+[assembly:AssemblyFileVersion("1.15.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -172,7 +172,7 @@ namespace VirtualDesktop
 		[PreserveSig]
 		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
 		void SwitchDesktop(IVirtualDesktop desktop);
-		void SwitchDesktopAndMoveForegroundView(IVirtualDesktop desktop);
+//		void SwitchDesktopAndMoveForegroundView(IVirtualDesktop desktop);
 		IVirtualDesktop CreateDesktop();
 		void MoveDesktop(IVirtualDesktop desktop, int nIndex);
 		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
@@ -2531,7 +2531,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2023, v1.14\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2023, v1.15\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 11.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");

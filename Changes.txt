@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.15, 2023-09-02
+- bug fix for Win 11 22H2 Build 22621.2215
+
 Version 1.14, 2023-08-29
 - version for Windows 11 22H2.2215 and up called VirtualDesktop11-23H2.cs
 - removed VirtualDesktopInsider.cs
