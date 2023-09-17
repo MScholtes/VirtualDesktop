@@ -3,12 +3,15 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
 **Pre-compiled binaries in Releases now**
 
-**Version 1.15, 2023-09-02**
-- bug fix for Win 11 22H2 Build 22621.2215, 2023/09/02
+**Version 1.16, 2023-09-17**
+- version for Windows 11 Insider Canary (build 25314 and up) called VirtualDesktop11InsiderCanary.cs
+- (re)introduced parameter /RemoveAll for all versions
 
 (look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
-**With Windows 11 22H2 Release 2215 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide six versions of virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11 22H2 up to release 2134, virtualdesktop11-23h2.cs for Windows 11 22H2 release 2215 and newer (including Insider) versions, virtualdesktop11-21h2.cs for Windows 11 21H2, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktop.cs is for Windows 10 1809 to 22H2, virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all executables will be generated.**
+**With Windows 11 22H2 Release 2215 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide seven versions of virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11 22H2 up to release 2134, virtualdesktop11-23h2.cs for Windows 11 22H2 release 2215 and newer (including Insider except Canary) versions, virtualdesktop11-21h2.cs for Windows 11 21H2, virtualdesktop11insidercanary.cs for Windows 11 Insider Canary, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktop.cs is for Windows 10 1809 to 22H2, virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all executables will be generated.**
+
+**I will make a cleanup of versions with the next release!**
 
 ## Generate:
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10 or 11)
@@ -53,7 +56,7 @@ Virtual desktop numbers start with 0.
 
 **/Remove[:&lt;n|s&gt;]**    remove desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /r).
 
-**/RemoveAll**       remove all desktops but visible (short: /ra)(only VirtualDesktop11.exe).
+**/RemoveAll**       remove all desktops but visible (short: /ra).
 
 **/SwapDesktop:&lt;n|s&gt;**  swap desktop in pipeline with desktop number &lt;n&gt;, desktop with text &lt;s&gt; in name or desktop with number in pipeline (short: /sd).
 

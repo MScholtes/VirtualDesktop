@@ -1,8 +1,8 @@
 // Author: Markus Scholtes, 2023
 // Version 1.16, 2023-09-17
-// Version for Windows 11 21H2
+// Version for Windows 11 Insider Canary Build 25314 and up
 // Compile with:
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11.cs
+// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11-23H2.cs
 
 using System;
 using System.Runtime.InteropServices;
@@ -147,33 +147,34 @@ namespace VirtualDesktop
 
 	[ComImport]
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	[Guid("536D3495-B208-4CC9-AE26-DE8111275BF8")]
+	[Guid("3F07F4BE-B107-441A-AF0F-39D82529072C")]
 	internal interface IVirtualDesktop
 	{
 		bool IsViewVisible(IApplicationView view);
 		Guid GetId();
-		IntPtr Unknown1();
 		[return: MarshalAs(UnmanagedType.HString)]
 		string GetName();
 		[return: MarshalAs(UnmanagedType.HString)]
 		string GetWallpaperPath();
+		bool IsRemote();
 	}
 
 	[ComImport]
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	[Guid("B2F925B9-5A0F-4D2E-9F4D-2B1507593C10")]
+	[Guid("A3175F2D-239C-4BD2-8AA0-EEBA8B0B138E")]
 	internal interface IVirtualDesktopManagerInternal
 	{
-		int GetCount(IntPtr hWndOrMon);
+		int GetCount();
 		void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
 		bool CanViewMoveDesktops(IApplicationView view);
-		IVirtualDesktop GetCurrentDesktop(IntPtr hWndOrMon);
-		void GetDesktops(IntPtr hWndOrMon, out IObjectArray desktops);
+		IVirtualDesktop GetCurrentDesktop();
+		void GetDesktops(out IObjectArray desktops);
 		[PreserveSig]
 		int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
-		void SwitchDesktop(IntPtr hWndOrMon, IVirtualDesktop desktop);
-		IVirtualDesktop CreateDesktop(IntPtr hWndOrMon);
-		void MoveDesktop(IVirtualDesktop desktop, IntPtr hWndOrMon, int nIndex);
+		void SwitchDesktop(IVirtualDesktop desktop);
+		void SwitchDesktopAndMoveForegroundView(IVirtualDesktop desktop);
+		IVirtualDesktop CreateDesktop();
+		void MoveDesktop(IVirtualDesktop desktop, int nIndex);
 		void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
 		IVirtualDesktop FindDesktop(ref Guid desktopid);
 		void GetDesktopSwitchIncludeExcludeViews(IVirtualDesktop desktop, out IObjectArray unknown1, out IObjectArray unknown2);
@@ -181,8 +182,11 @@ namespace VirtualDesktop
 		void SetDesktopWallpaper(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
 		void UpdateWallpaperPathForAllDesktops([MarshalAs(UnmanagedType.HString)] string path);
 		void CopyDesktopState(IApplicationView pView0, IApplicationView pView1);
-		int GetDesktopIsPerMonitor();
-		void SetDesktopIsPerMonitor(bool state);
+		void CreateRemoteDesktop([MarshalAs(UnmanagedType.HString)] string path, out IVirtualDesktop desktop);
+		void SwitchRemoteDesktop(IVirtualDesktop desktop);
+		void SwitchDesktopWithAnimation(IVirtualDesktop desktop);
+		void GetLastActiveDesktop(out IVirtualDesktop desktop);
+		void WaitForAnimationToComplete();
 	}
 
 	[ComImport]
@@ -246,10 +250,10 @@ namespace VirtualDesktop
 
 		internal static IVirtualDesktop GetDesktop(int index)
 		{	// get desktop with index
-			int count = VirtualDesktopManagerInternal.GetCount(IntPtr.Zero);
+			int count = VirtualDesktopManagerInternal.GetCount();
 			if (index < 0 || index >= count) throw new ArgumentOutOfRangeException("index");
 			IObjectArray desktops;
-			VirtualDesktopManagerInternal.GetDesktops(IntPtr.Zero, out desktops);
+			VirtualDesktopManagerInternal.GetDesktops(out desktops);
 			object objdesktop;
 			desktops.GetAt(index, typeof(IVirtualDesktop).GUID, out objdesktop);
 			Marshal.ReleaseComObject(desktops);
@@ -261,9 +265,9 @@ namespace VirtualDesktop
 			int index = -1;
 			Guid IdSearch = desktop.GetId();
 			IObjectArray desktops;
-			VirtualDesktopManagerInternal.GetDesktops(IntPtr.Zero, out desktops);
+			VirtualDesktopManagerInternal.GetDesktops(out desktops);
 			object objdesktop;
-			for (int i = 0; i < VirtualDesktopManagerInternal.GetCount(IntPtr.Zero); i++)
+			for (int i = 0; i < VirtualDesktopManagerInternal.GetCount(); i++)
 			{
 				desktops.GetAt(i, typeof(IVirtualDesktop).GUID, out objdesktop);
 				if (IdSearch.CompareTo(((IVirtualDesktop)objdesktop).GetId()) == 0)
@@ -344,12 +348,12 @@ namespace VirtualDesktop
 
 		public static int Count
 		{ // return the number of desktops
-			get { return DesktopManager.VirtualDesktopManagerInternal.GetCount(IntPtr.Zero); }
+			get { return DesktopManager.VirtualDesktopManagerInternal.GetCount(); }
 		}
 
 		public static Desktop Current
 		{ // returns current desktop
-			get { return new Desktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop(IntPtr.Zero)); }
+			get { return new Desktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop()); }
 		}
 
 		public static Desktop FromIndex(int index)
@@ -362,7 +366,7 @@ namespace VirtualDesktop
 			if (hWnd == IntPtr.Zero) throw new ArgumentNullException();
 			Guid id = DesktopManager.VirtualDesktopManager.GetWindowDesktopId(hWnd);
 			if ((id.CompareTo(AppOnAllDesktops) == 0) || (id.CompareTo(WindowOnAllDesktops) == 0))
-				return new Desktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop(IntPtr.Zero));
+				return new Desktop(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
 			else
 				return new Desktop(DesktopManager.VirtualDesktopManagerInternal.FindDesktop(ref id));
 		}
@@ -442,7 +446,7 @@ namespace VirtualDesktop
 		{ // get index of desktop with partial name, return -1 if no desktop found
 			int index = -1;
 
-			for (int i = 0; i < DesktopManager.VirtualDesktopManagerInternal.GetCount(IntPtr.Zero); i++)
+			for (int i = 0; i < DesktopManager.VirtualDesktopManagerInternal.GetCount(); i++)
 			{ // loop through all virtual desktops and compare partial name to desktop name
 				if (DesktopNameFromIndex(i).ToUpper().IndexOf(partialName.ToUpper()) >= 0)
 				{ index = i;
@@ -455,7 +459,7 @@ namespace VirtualDesktop
 
 		public static Desktop Create()
 		{ // create a new desktop
-			return new Desktop(DesktopManager.VirtualDesktopManagerInternal.CreateDesktop(IntPtr.Zero));
+			return new Desktop(DesktopManager.VirtualDesktopManagerInternal.CreateDesktop());
 		}
 
 		public void Remove(Desktop fallback = null)
@@ -482,12 +486,24 @@ namespace VirtualDesktop
 
 		public static void RemoveAll()
 		{ // remove all desktops but visible
-			DesktopManager.VirtualDesktopManagerInternal.SetDesktopIsPerMonitor(true);
+			int desktopcount = DesktopManager.VirtualDesktopManagerInternal.GetCount();
+			int desktopcurrent = DesktopManager.GetDesktopIndex(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
+			
+			if (desktopcurrent < desktopcount-1)
+			{ // remove all desktops "right" from current
+				for (int i = desktopcount-1; i > desktopcurrent; i--)
+					DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(DesktopManager.GetDesktop(i), DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
+			}
+			if (desktopcurrent > 0)
+			{ // remove all desktops "left" from current
+				for (int i = 0; i < desktopcurrent; i++)
+					DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(DesktopManager.GetDesktop(0), DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
+			}
 		}
 
 		public void Move(int index)
 		{ // move current desktop to desktop in index (-> index = 0..Count-1)
-			DesktopManager.VirtualDesktopManagerInternal.MoveDesktop(ivd, IntPtr.Zero, index);
+			DesktopManager.VirtualDesktopManagerInternal.MoveDesktop(ivd, index);
 		}
 
 		public void SetName(string Name)
@@ -509,7 +525,7 @@ namespace VirtualDesktop
 
 		public bool IsVisible
 		{ // return true if this desktop is the current displayed one
-			get { return object.ReferenceEquals(ivd, DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop(IntPtr.Zero)); }
+			get { return object.ReferenceEquals(ivd, DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop()); }
 		}
 
 		public void MakeVisible()
@@ -531,7 +547,7 @@ namespace VirtualDesktop
 				AttachThreadInput(DesktopThreadId, CurrentThreadId, false);
 			}
 
-			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(IntPtr.Zero, ivd);
+			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(ivd);
 
 			// direct desktop to give away focus
 			ShowWindow(new IntPtr(wi.Handle), SW_MINIMIZE);
@@ -2528,7 +2544,7 @@ namespace VDeskTool
 		{
 			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2023, v1.16\n");
 
-			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 11.");
+			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 11 Insider Canary.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");
 			Console.WriteLine("times the number of the processed desktop - can be used as input for the next");
 			Console.WriteLine("parameter. The result of the last command is returned as error level.");

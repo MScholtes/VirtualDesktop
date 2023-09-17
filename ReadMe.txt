@@ -5,8 +5,9 @@ VirtualDesktop
 
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-Version 1.15, 2023-09-02
-- bug fix for Win 11 22H2 Build 22621.2215
+Version 1.16, 2023-09-17
+- version for Windows 11 Insider Canary (build 25314 and up) called VirtualDesktop11InsiderCanary.cs
+- (re)introduced parameter /RemoveAll for all versions
 
 (look for a powershell version here:
 https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5
@@ -14,18 +15,17 @@ or here:
 https://www.powershellgallery.com/packages/VirtualDesktop)
 
 
-With Windows 11 22H2 Microsoft did change the API (COM GUIDs) for accessing the
-functions for virtual desktops again. I provide six versions of
-virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11, virtualdesktop11-
-21h2.cs for Windows 11 21H2, virtualdesktopserver2022.cs is for Windows Server
-2022, virtualdesktop.cs is for Windows 10 1809 to 21H2,
-virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all
-executables will be generated.
+With Windows 11 22H2 Release 2215 Microsoft did change the API (COM GUIDs) for 
+accessing the functions for virtual desktops again. I provide seven versions of 
+virtualdesktop.cs now: virtualdesktop11.cs is for Windows 11 22H2 up to release 
+2134, virtualdesktop11-23h2.cs for Windows 11 22H2 release 2215 and newer 
+(including Insider except Canary) versions, virtualdesktop11-21h2.cs for Windows 
+11 21H2, virtualdesktop11insidercanary.cs for Windows 11 Insider Canary, 
+virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktop.cs is for 
+Windows 10 1809 to 22H2, virtualdesktopserver2016.cs is for Windows Server 2016. 
+Using Compile.bat all executables will be generated.
 
-See:
-https://github.com/Grabacr07/VirtualDesktop/issues/29
-https://github.com/mzomparelli/zVirtualDesktop/wiki
-
+I will make a cleanup of versions with the next release!
 
 Generate:
  Compile with Compile.bat (no visual studio needed, but obviously Windows 10 or 11)
@@ -56,7 +56,7 @@ Parameters (leading / can be omitted or - can be used instead):
 /Wrap /NoWrap /Left or /Right switch over or generate an error when the edge is reached (default)(short /w and /nw).
 /New             create new desktop (short: /n). Number is stored in pipeline.
 /Remove[:<n|s>]  remove desktop number <n>, desktop with text <s> in name or desktop with number in pipeline (short: /r).
-/RemoveAll       remove all desktops but visible (short: /ra)(only VirtualDesktop11.exe).
+/RemoveAll       remove all desktops but visible (short: /ra).
 /SwapDesktop:<n|s>  swap desktop in pipeline with desktop number <n>, desktop with text <s> in name or desktop with number in pipeline (short: /sd).
 /InsertDesktop:<n|s>  insert desktop number <n> or desktop with text <s> in name before desktop in pipeline or vice versa (short: /id)(not VirtualDesktop11.exe).
 /MoveDesktop:<n|s>  move desktop in pipeline to desktop number <n> or desktop with text <s> in name (short: /md)(only VirtualDesktop11.exe).
