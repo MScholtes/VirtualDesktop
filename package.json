@@ -1,3 +1,4 @@
 {
-    "name" : "virtual-desktop"
+    "name" : "virtual-desktop",
+    "main" : "package.json"
 }
