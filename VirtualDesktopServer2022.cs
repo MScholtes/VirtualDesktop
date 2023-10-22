@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2023")]
+[assembly:AssemblyCopyright("ï¿½ Markus Scholtes 2023")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
 [assembly:AssemblyVersion("1.16.0.0")]
@@ -815,9 +815,21 @@ namespace VDeskTool
 								if (verbose) Console.WriteLine("\nCount of desktops: " + desktopCount);
 								break;
 
+							case "WAITDESKTOPCHANGE":
+							case "WDC":
 							case "GETCURRENTDESKTOP": // get number of current desktop and display desktop name
 							case "GCD":
 								rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+								switch(groups[1].Value.ToUpper()) {
+									case "WAITDESKTOPCHANGE":
+									case "WDC":
+									System.Threading.Thread.Sleep(5);
+									if (verbose) Console.WriteLine("Waiting for desktop to change from: '" + VirtualDesktop.Desktop.DesktopNameFromDesktop(VirtualDesktop.Desktop.Current) + "' (desktop number " + rc + ")");
+									while (rc == VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current)) {
+										System.Threading.Thread.Sleep(5);
+									}
+									break;						
+								}
 								if (verbose) Console.WriteLine("Current desktop: '" + VirtualDesktop.Desktop.DesktopNameFromDesktop(VirtualDesktop.Desktop.Current) + "' (desktop number " + rc + ")");
 								break;
 
