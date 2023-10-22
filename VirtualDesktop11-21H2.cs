@@ -820,7 +820,38 @@ namespace VDeskTool
 								}
 								if (verbose) Console.WriteLine("\nCount of desktops: " + desktopCount);
 								break;
+							case "JSON":
 
+							    desktopCount = VirtualDesktop.Desktop.Count;
+							    visibleDesktop = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+								
+								Console.WriteLine("{");
+								Console.WriteLine("  \"count\":"+desktopCount+",");
+								Console.WriteLine("  \"desktops\":[");
+								string comma = "";
+								for (int i = 0; i < desktopCount; i++)
+								{
+									Console.WriteLine(comma+"  {");
+									Console.WriteLine("    \"name\":\""+VirtualDesktop.Desktop.DesktopNameFromIndex(i).Replace("\\","\\\\")+"\",");
+									Console.Write("    \"visible\":");
+									
+									if (i != visibleDesktop)
+										Console.WriteLine("false,");
+									else
+										Console.WriteLine("true,");
+
+									Console.Write("    \"wallpaper\":");
+
+									if (string.IsNullOrEmpty(VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i)))
+										Console.WriteLine("null");
+									else
+										Console.WriteLine("\"" + VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i).Replace("\\","\\\\") + "\"");
+									Console.Write("  }");
+									comma=",\n";
+								}
+								Console.WriteLine("\n  ]"); 
+								Console.WriteLine("}");
+								break;
 							case "WAITDESKTOPCHANGE": // wait for desktop to change
 							case "WDC":
 							case "GETCURRENTDESKTOP": // get number of current desktop and display desktop name
