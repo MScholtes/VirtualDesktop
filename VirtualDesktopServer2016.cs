@@ -757,7 +757,7 @@ namespace VDeskTool
 								if (verbose) Console.WriteLine("\nCount of desktops: " + desktopCount);
 								break;
 
-							case "WAITDESKTOPCHANGE":
+							case "WAITDESKTOPCHANGE": // wait for desktop to change
 							case "WDC":
 							case "GETCURRENTDESKTOP": // get number of current desktop and display desktop name
 							case "GCD":
@@ -765,12 +765,14 @@ namespace VDeskTool
 								switch(groups[1].Value.ToUpper()) {
 									case "WAITDESKTOPCHANGE":
 									case "WDC":
-									System.Threading.Thread.Sleep(5);
+									 
 									if (verbose) Console.WriteLine("Waiting for desktop to change from: '" + VirtualDesktop.Desktop.DesktopNameFromDesktop(VirtualDesktop.Desktop.Current) + "' (desktop number " + rc + ")");
-									while (rc == VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current)) {
+									int was=rc;
+									while (rc == was) {
 										System.Threading.Thread.Sleep(5);
-									}	
-									break;					
+										rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+									}
+									break;						
 								}
 								if (verbose) Console.WriteLine("Current desktop: '" + VirtualDesktop.Desktop.DesktopNameFromDesktop(VirtualDesktop.Desktop.Current) + "' (desktop number " + rc + ")");
 								break;
@@ -2531,6 +2533,7 @@ namespace VDeskTool
 			Console.WriteLine("                   for no.");
 			Console.WriteLine("/Calc:<n>        add <n> to result, negative values are allowed (short: /ca).");
 			Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
+			Console.WriteLine("/WaitDesktopChange wait for desktop to change (short: /wdc).");
 			Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
 			Console.WriteLine("Hint: Instead of a desktop name you can use LAST or *LAST* to select the last");
 			Console.WriteLine("virtual desktop.");
