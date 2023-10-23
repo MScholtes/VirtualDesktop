@@ -666,6 +666,7 @@ namespace VDeskTool
 		static bool breakonerror = true;
 		static bool wrapdesktops = false;
 		static int rc = 0;
+		
 
 		static int Main(string[] args)
 		{
@@ -674,6 +675,8 @@ namespace VDeskTool
 				HelpScreen();
 				return -2;
 			}
+
+			var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
 
 			foreach (string arg in args)
 			{
@@ -689,7 +692,8 @@ namespace VDeskTool
 
 					if (groups[2].Value == "")
 					{ // parameter without value
-						switch(groups[1].Value.ToUpper())
+						string upperToken = groups[1].Value.ToUpper();
+						switch(upperToken)
 						{
 							case "HELP": // help screen
 							case "H":
@@ -761,39 +765,150 @@ namespace VDeskTool
 							    desktopCount = VirtualDesktop.Desktop.Count;
 							    visibleDesktop = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
 								
-								Console.WriteLine("{");
-								Console.WriteLine("  \"count\":"+desktopCount+",");
-								Console.WriteLine("  \"desktops\":[");
+
+								Console.Write("{");
+								Console.Write("\"count\":"+desktopCount+",");
+								Console.Write("\"desktops\":[");
 								string comma = "";
 								for (int i = 0; i < desktopCount; i++)
 								{
-									Console.WriteLine(comma+"  {");
-									Console.WriteLine("    \"name\":\""+VirtualDesktop.Desktop.DesktopNameFromIndex(i).Replace("\\","\\\\")+"\",");
-									Console.Write("    \"visible\":");
+									Console.Write(comma+"{");
+									Console.Write("\"name\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i)));
+									Console.Write("\"visible\":");
 									
 									if (i != visibleDesktop)
-										Console.WriteLine("false,");
+										Console.Write("false,");
 									else
-										Console.WriteLine("true,");
+										Console.Write("true,");
 
-									Console.Write("    \"wallpaper\":");
+									Console.Write("\"wallpaper\":");
 
 									//if (string.IsNullOrEmpty(VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i)))
-										Console.WriteLine("null");
+										Console.Write("null");
 									//else
-									//	Console.WriteLine("\"" + VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i).Replace("\\","\\\\") + "\"");
-									Console.Write("  }");
-									comma=",\n";
+									//	Console.Write( serializer.Serialize(VirtualDesktop.Desktop.DesktopWallpaperFromIndex(i)) );
+									Console.Write("}");
+									comma=",";
 								}
-								Console.WriteLine("\n  ]"); 
+								Console.Write("]"); 
 								Console.WriteLine("}");
 								break;
+
+							case "INTERACTIVE":
+							case "INT":
+										
+								string argstr = "";
+								bool echo = true;
+
+								int lastDT = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+
+								verbose = false;
+								while (true)
+								{
+								 
+									if (Console.KeyAvailable )
+									{
+										var cki = Console.ReadKey(true);
+										if (cki.Key == ConsoleKey.Escape) {
+											break;
+										} 
+
+										if (cki.Key == ConsoleKey.Backspace) {
+											 
+											if (argstr != "" ) {
+												argstr = argstr.Substring(0,argstr.Length-1);
+											}  
+											if (echo) {
+												Console.Write(cki.KeyChar);
+												Console.Write(" ");
+												Console.Write(cki.KeyChar);
+											}
+											continue;
+										}
+
+										 
+										if (cki.Key == ConsoleKey.Enter) {
+
+											if (argstr == "") {
+												continue;
+											}
+											if (echo) {
+												Console.WriteLine("");
+											}
+
+											string[] splits = argstr.Split(' ');
+											argstr = "";
+
+											switch (splits[0].ToUpper()) {
+
+												
+												
+												case "INTERACTIVE":// prevent recursion
+												case "INT":// prevent recursion
+
+												case "BREAK":
+												case "B":
+												case "CONTINUE":
+												case "CO":
+												case "WAITDESKTOPCHANGE":
+												case "WDC": 
+													//Console.WriteLine();
+
+													
+													Console.WriteLine("\n{\"error\":"+  serializer.Serialize("Invalid Command:"+splits[0])+"}");
+													continue;
+
+												case "NAMES":
+
+													int dtc = VirtualDesktop.Desktop.Count;
+													Console.Write("[");
+													string cma = "";
+													for (int i = 0; i < dtc; i++)
+													{
+													    Console.Write(cma+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i)));
+														cma=",";
+													}
+													Console.WriteLine("]");
+												    continue;
+												 
+
+											}
+
+											Main(splits);
+											 
+											Console.WriteLine("\n{\"visibleIndex\":"+rc+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(rc))+"}");
+											 
+
+											 
+										} else {
+											argstr += cki.KeyChar;
+											if (echo) {
+												Console.Write(cki.KeyChar);
+											}
+											continue;
+										}
+										
+									}
+									else {
+										int thisDT = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+										if (lastDT != thisDT) {
+											Console.WriteLine("\n{\"visibleIndex\":"+thisDT+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(thisDT))+"}");
+											lastDT = thisDT;
+										}
+
+									}
+								}
+
+
+							break;
+
+
 							case "WAITDESKTOPCHANGE": // wait for desktop to change
 							case "WDC":
 							case "GETCURRENTDESKTOP": // get number of current desktop and display desktop name
 							case "GCD":
 								rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
-								switch(groups[1].Value.ToUpper()) {
+								switch(upperToken) {
 									case "WAITDESKTOPCHANGE":
 									case "WDC":
 									 
@@ -2585,3 +2700,4 @@ namespace VDeskTool
 
 	}
 }
+
