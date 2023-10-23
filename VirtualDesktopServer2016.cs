@@ -838,11 +838,11 @@ namespace VDeskTool
 
 											string[] splits = argstr.Split(' ');
 											argstr = "";
-
-											switch (splits[0].ToUpper()) {
-
-												
-												
+											string token = splits[0].ToUpper();
+											if (token.Length>1 && token.Substring(0,1)=="/") {
+												token = token.Substring(1);
+											}
+											switch (token) {												
 												case "INTERACTIVE":// prevent recursion
 												case "INT":// prevent recursion
 
@@ -870,14 +870,73 @@ namespace VDeskTool
 													}
 													Console.WriteLine("]");
 												    continue;
-												 
+
+												case "LEFT":
+												case "P":
+												case "PREVIOUS":
+												   
+												   if (lastDT==0) {
+													   token="GCD";
+												   } else {
+													   token="L";													   
+												   }
+												   splits=token.Split(' ');
+												   lastDT=-1;
+												   break;
+
+												case "L":
+
+													if (lastDT==0) {
+													   token="GCD";
+													   splits=token.Split(' ');
+												   }
+												   lastDT=-1;
+												   break;
+
+												case "RIGHT":
+												case "NEXT":
+												   
+												   if (lastDT==VirtualDesktop.Desktop.Count-1) {
+													   token="GCD";
+												   } else {
+													   token="RI";													   
+												   }
+												   splits=token.Split(' ');
+												   lastDT=-1;
+												   break;
+
+												case "RI":
+												
+													 if (lastDT==VirtualDesktop.Desktop.Count-1) {
+													   token="GCD";
+													   splits=token.Split(' ');
+												    }
+												   lastDT=-1;
+												   break;
+
+												case "GCD":
+												case "GETCURRENTDESKTOP":
+												   
+												    lastDT=-1;// force a reporting of the desktop
+
+													break;
 
 											}
-
+											
+											if ( ((token.Length>=7) && (token.Substring(0,7)=="SWITCH:")) || 
+											     ((token.Length>=2) && (token.Substring(0,2)=="S:")) ) {
+												    lastDT=-1;// force a reporting of the desktop, even if the switched to desktop is the same as the current desktop
+											}
+	
 											Main(splits);
-											 
-											Console.WriteLine("\n{\"visibleIndex\":"+rc+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(rc))+"}");
-											 
+
+											switch (token) {	
+												case "NEW":
+												case "N":
+											 	Main(("S:"+rc).Split(' '));
+											     //Console.WriteLine("\n{\"visibleIndex\":"+rc+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(rc))+"}");
+												break;
+											}
 
 											 
 										} else {
@@ -888,8 +947,7 @@ namespace VDeskTool
 											continue;
 										}
 										
-									}
-									else {
+									} else {
 										int thisDT = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
 										if (lastDT != thisDT) {
 											Console.WriteLine("\n{\"visibleIndex\":"+thisDT+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(thisDT))+"}");
