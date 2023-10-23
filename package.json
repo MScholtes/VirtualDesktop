@@ -1,4 +1,13 @@
 {
     "name" : "virtual-desktop",
-    "main" : "package.json"
+    "main" : "package.json",
+    "version": "1.0.0",
+    "description": "switch virtual desktops on windows 10,11",
+    "--info--" : [
+        "this package.json file",
+        "exists simply to allow this repo to be",
+        "a dependancy of a node.js package that uses it",
+        "the main points this package to itself, however it's not intended to",
+        "be used as a loadable module, simply a container for the included files"       
+    ]
 }
