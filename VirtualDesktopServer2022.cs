@@ -830,7 +830,7 @@ namespace VDeskTool
 								for (int i = 0; i < desktopCount; i++)
 								{
 									Console.Write(comma+"{");
-									Console.Write("\"name\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i)));
+									Console.Write("\"name\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i))+",");
 									Console.Write("\"visible\":");
 									
 									if (i != visibleDesktop)
@@ -851,7 +851,8 @@ namespace VDeskTool
 								Console.WriteLine("}");
 								break;
 
-case "INTERACTIVE":
+
+							case "INTERACTIVE":
 							case "INT":
 										
 								string argstr = "";
