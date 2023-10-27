@@ -1,7 +1,7 @@
 {
     "name" : "virtual-desktop",
     "main" : "package.json",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "switch virtual desktops on windows 10,11",
     "--info--" : [
         "this package.json file",
