@@ -865,7 +865,7 @@ namespace VDeskTool
 
 								Console.Write("{");
 								Console.Write("\"count\":"+desktopCount+",");
-								Console.Write("\"desktops\":[");
+								Console.Write("\"desktops\": [");
 								string comma = "";
 								for (int i = 0; i < desktopCount; i++)
 								{
