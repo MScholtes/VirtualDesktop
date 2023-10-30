@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Threading;
 
 // set attributes
 using System.Reflection;
@@ -722,6 +723,39 @@ namespace VirtualDesktop
 
 namespace VDeskTool
 {
+
+		class Reader {
+		private static Thread inputThread;
+		private static AutoResetEvent getInput, gotInput;
+		private static string input;
+
+		static Reader() {
+			getInput = new AutoResetEvent(false);
+			gotInput = new AutoResetEvent(false);
+			inputThread = new Thread(reader);
+			inputThread.IsBackground = true;
+			inputThread.Start();
+		}
+
+		private static void reader() {
+			while (true) {
+			getInput.WaitOne();
+			input = Console.ReadLine();
+			gotInput.Set();
+			}
+		}
+
+		// omit the parameter to read a line without a timeout
+		public static string ReadLine(int timeOutMillisecs = Timeout.Infinite) {
+			getInput.Set();
+			bool success = gotInput.WaitOne(timeOutMillisecs);
+			if (success)
+			return input;
+			else
+			throw new TimeoutException("User did not provide input within the timelimit.");
+		}
+	}
+
 	static class Program
 	{
 		static bool verbose = true;
@@ -835,7 +869,7 @@ namespace VDeskTool
 								for (int i = 0; i < desktopCount; i++)
 								{
 									Console.Write(comma+"{");
-									Console.Write("\"name\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i))+",");
+									Console.Write("\"name\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i)));
 									Console.Write("\"visible\":");
 									
 									if (i != visibleDesktop)
@@ -858,53 +892,118 @@ namespace VDeskTool
 
 							case "INTERACTIVE":
 							case "INT":
-										
+
 								string argstr = "";
 								bool echo = true;
 
 								int lastDT = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+								bool interactive = true;
+								try
+								{
+									bool test = Console.KeyAvailable;
+								}
+								catch
+								{
+									interactive = false;
+								}
 
 								verbose = false;
 								while (true)
 								{
-								 
-									if (Console.KeyAvailable )
-									{
-										var cki = Console.ReadKey(true);
-										if (cki.Key == ConsoleKey.Escape) {
-											break;
-										} 
+									bool cmdReady = false;
+									bool idle = true;
 
-										if (cki.Key == ConsoleKey.Backspace) {
-											 
-											if (argstr != "" ) {
-												argstr = argstr.Substring(0,argstr.Length-1);
-											}  
-											if (echo) {
-												Console.Write(cki.KeyChar);
-												Console.Write(" ");
-												Console.Write(cki.KeyChar);
+									if (interactive)
+									{
+
+										if (Console.KeyAvailable) {
+											idle = false;
+
+											var cki = Console.ReadKey(true);
+											if (cki.Key == ConsoleKey.Escape)
+											{
+												break;
 											}
-											continue;
+
+											if (cki.Key == ConsoleKey.Backspace)
+											{
+
+												if (argstr != "")
+												{
+													argstr = argstr.Substring(0, argstr.Length - 1);
+												}
+												if (echo)
+												{
+													Console.Write(cki.KeyChar);
+													Console.Write(" ");
+													Console.Write(cki.KeyChar);
+												}
+												continue;
+											}
+
+
+											if (cki.Key == ConsoleKey.Enter)
+											{
+
+												cmdReady = true;
+											}
+											else
+											{
+												argstr += cki.KeyChar;
+												if (echo)
+												{
+													Console.Write(cki.KeyChar);
+												}
+												continue;
+											}
+										}
+									}
+									else
+									{
+										try {
+											string temp = Reader.ReadLine(50);
+											cmdReady = true;
+											idle = false;
+											argstr = temp;
+											
+
+										} catch (TimeoutException) {
+											 
 										}
 
-										 
-										if (cki.Key == ConsoleKey.Enter) {
+									}
+
+									if (idle)
+									{
+										int thisDT = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
+										if (lastDT != thisDT) {
+											Console.WriteLine("{\"visibleIndex\":" + thisDT + ",\"visible\":" + serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(thisDT)) + "}");
+											lastDT = thisDT;
+										} else {
+											System.Threading.Thread.Sleep(5);
+										}
+									}
+									else
+									{
+
+										if (cmdReady) {
 
 											if (argstr == "") {
 												continue;
 											}
-											if (echo) {
+
+											if (echo&&interactive) {
 												Console.WriteLine("");
 											}
 
 											string[] splits = argstr.Split(' ');
 											argstr = "";
 											string token = splits[0].ToUpper();
-											if (token.Length>1 && token.Substring(0,1)=="/") {
+											if (token.Length > 1 && token.Substring(0, 1) == "/") {
 												token = token.Substring(1);
 											}
-											switch (token) {												
+											switch (token)
+											{
 												case "INTERACTIVE":// prevent recursion
 												case "INT":// prevent recursion
 
@@ -913,115 +1012,110 @@ namespace VDeskTool
 												case "CONTINUE":
 												case "CO":
 												case "WAITDESKTOPCHANGE":
-												case "WDC": 
-													//Console.WriteLine();
+												case "WDC":
 
-													
-													Console.WriteLine("\n{\"error\":"+  serializer.Serialize("Invalid Command:"+splits[0])+"}");
+													Console.WriteLine("\n{\"error\":" + serializer.Serialize("Invalid Command:" + splits[0]) + "}");
 													continue;
 
 												case "NAMES":
 
 													int dtc = VirtualDesktop.Desktop.Count;
-													Console.Write("[");
+													string json = "[";
 													string cma = "";
 													for (int i = 0; i < dtc; i++)
 													{
-													    Console.Write(cma+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i)));
-														cma=",";
+														json += cma + serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(i));
+														cma = ",";
 													}
-													Console.WriteLine("]");
-												    continue;
+													json += "]";
+													Console.WriteLine(json);
+													continue;
 
 												case "LEFT":
 												case "P":
 												case "PREVIOUS":
-												   
-												   if (lastDT==0) {
-													   token="GCD";
-												   } else {
-													   token="L";													   
-												   }
-												   splits=token.Split(' ');
-												   lastDT=-1;
-												   break;
+
+													if (lastDT == 0)
+													{
+														token = "GCD";
+													}
+													else
+													{
+														token = "L";
+													}
+													splits = token.Split(' ');
+													lastDT = -1;
+													break;
 
 												case "L":
 
-													if (lastDT==0) {
-													   token="GCD";
-													   splits=token.Split(' ');
-												   }
-												   lastDT=-1;
-												   break;
+													if (lastDT == 0)
+													{
+														token = "GCD";
+														splits = token.Split(' ');
+													}
+													lastDT = -1;
+													break;
 
 												case "RIGHT":
 												case "NEXT":
-												   
-												   if (lastDT==VirtualDesktop.Desktop.Count-1) {
-													   token="GCD";
-												   } else {
-													   token="RI";													   
-												   }
-												   splits=token.Split(' ');
-												   lastDT=-1;
-												   break;
+
+													if (lastDT == VirtualDesktop.Desktop.Count - 1)
+													{
+														token = "GCD";
+													}
+													else
+													{
+														token = "RI";
+													}
+													splits = token.Split(' ');
+													lastDT = -1;
+													break;
 
 												case "RI":
-												
-													 if (lastDT==VirtualDesktop.Desktop.Count-1) {
-													   token="GCD";
-													   splits=token.Split(' ');
-												    }
-												   lastDT=-1;
-												   break;
+
+													if (lastDT == VirtualDesktop.Desktop.Count - 1)
+													{
+														token = "GCD";
+														splits = token.Split(' ');
+													}
+													lastDT = -1;
+													break;
 
 												case "GCD":
 												case "GETCURRENTDESKTOP":
-												   
-												    lastDT=-1;// force a reporting of the desktop
+
+													lastDT = -1;// force a reporting of the desktop
 
 													break;
 
 											}
-											
-											if ( ((token.Length>=7) && (token.Substring(0,7)=="SWITCH:")) || 
-											     ((token.Length>=2) && (token.Substring(0,2)=="S:")) ) {
-												    lastDT=-1;// force a reporting of the desktop, even if the switched to desktop is the same as the current desktop
+
+											if (((token.Length >= 7) && (token.Substring(0, 7) == "SWITCH:")) ||
+												((token.Length >= 2) && (token.Substring(0, 2) == "S:"))) {
+												lastDT = -1;// force a reporting of the desktop, even if the switched to desktop is the same as the current desktop
 											}
-	
+
 											Main(splits);
 
-											switch (token) {	
+											switch (token)
+											{
 												case "NEW":
 												case "N":
-											 	Main(("S:"+rc).Split(' '));
-											     //Console.WriteLine("\n{\"visibleIndex\":"+rc+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(rc))+"}");
-												break;
+													Main(("S:" + rc).Split(' '));
+													break;
 											}
+											
+											 Console.Out.Flush();
 
-											 
-										} else {
-											argstr += cki.KeyChar;
-											if (echo) {
-												Console.Write(cki.KeyChar);
-											}
-											continue;
 										}
-										
-									} else {
-										int thisDT = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
-										if (lastDT != thisDT) {
-											Console.WriteLine("\n{\"visibleIndex\":"+thisDT+",\"visible\":"+serializer.Serialize(VirtualDesktop.Desktop.DesktopNameFromIndex(thisDT))+"}");
-											lastDT = thisDT;
-										}
-
 									}
 								}
 
+						
 
-							break;
 
+						break;
 
 							case "WAITDESKTOPCHANGE": // wait for desktop to change
 							case "WDC":
