@@ -1102,6 +1102,7 @@ namespace VDeskTool
 												case "NEW":
 												case "N":
 													Main(("S:" + rc).Split(' '));
+													Console.WriteLine("{\"count\":"+VirtualDesktop.Desktop.Count+"}");
 													break;
 											}
 											
