@@ -1,6 +1,21 @@
 # VirtualDesktop
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
+**a fork of [VirtualDesktop by MScholtes](https://github.com/MScholtes/VirtualDesktop);**
+
+ Changes introduced
+ 
+  - command /JSON
+     * reports desktops in JSON parseable format
+
+        ```{"count":1,"desktops":[{"name":"Desktop 1""visible":true,"wallpaper":"C:\\wallpaper.jpg"}]}```            
+  - aliases `/NEXT` to `/RIGHT` and `/PREVIOUS` to `/LEFT`00
+
+  - Interactive Mode (stays in memory and reports changes)
+
+
+original readme follows:
+
 **Pre-compiled binaries in Releases now**
 
 **Version 1.16, 2023-09-17**

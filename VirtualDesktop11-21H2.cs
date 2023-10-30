@@ -1012,8 +1012,6 @@ namespace VDeskTool
 												case "B":
 												case "CONTINUE":
 												case "CO":
-												case "WAITDESKTOPCHANGE":
-												case "WDC":
 
 													Console.WriteLine("\n{\"error\":" + serializer.Serialize("Invalid Command:" + splits[0]) + "}");
 													continue;
@@ -1118,23 +1116,10 @@ namespace VDeskTool
 
 						break;
 
-							case "WAITDESKTOPCHANGE": // wait for desktop to change
-							case "WDC":
 							case "GETCURRENTDESKTOP": // get number of current desktop and display desktop name
 							case "GCD":
 								rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
-								switch(upperToken) {
-									case "WAITDESKTOPCHANGE":
-									case "WDC":
-									 
-									if (verbose) Console.WriteLine("Waiting for desktop to change from: '" + VirtualDesktop.Desktop.DesktopNameFromDesktop(VirtualDesktop.Desktop.Current) + "' (desktop number " + rc + ")");
-									int was=rc;
-									while (rc == was) {
-										System.Threading.Thread.Sleep(5);
-										rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
-									}
-									break;						
-								}
+								
 								if (verbose) Console.WriteLine("Current desktop: '" + VirtualDesktop.Desktop.DesktopNameFromDesktop(VirtualDesktop.Desktop.Current) + "' (desktop number " + rc + ")");
 								break;
 
@@ -2922,7 +2907,6 @@ namespace VDeskTool
 			Console.WriteLine("                   for no.");
 			Console.WriteLine("/Calc:<n>        add <n> to result, negative values are allowed (short: /ca).");
 			Console.WriteLine("/WaitKey         wait for key press (short: /wk).");
-			Console.WriteLine("/WaitDesktopChange wait for desktop to change (short: /wdc).");
 			Console.WriteLine("/Sleep:<n>       wait for <n> milliseconds (short: /sl).\n");
 			Console.WriteLine("Hint: Instead of a desktop name you can use LAST or *LAST* to select the last");
 			Console.WriteLine("virtual desktop.");
