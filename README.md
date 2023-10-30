@@ -4,14 +4,36 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 **a fork of [VirtualDesktop by MScholtes](https://github.com/MScholtes/VirtualDesktop);**
 
  Changes introduced
- 
-  - command /JSON
+
+  - aliases `/NEXT` to `/RIGHT` and `/PREVIOUS` to `/LEFT`
+
+  - adds new command `/JSON`
      * reports desktops in JSON parseable format
 
         ```{"count":1,"desktops":[{"name":"Desktop 1""visible":true,"wallpaper":"C:\\wallpaper.jpg"}]}```            
-  - aliases `/NEXT` to `/RIGHT` and `/PREVIOUS` to `/LEFT`00
+     * can be used by from the command line, but is mainly intended to be used in interactive mode
 
-  - Interactive Mode (stays in memory and reports changes)
+  
+  - Interactive Mode  `/INTERACTIVE` or `/INT`
+    
+    * accepts keyboard input (or stdin via pipe, one command per line)
+    * can be used for testing, but mainly implemented to allow [node.js modules](https://github.com/jonathan-annett/virtual-desktop-node) to use it
+    * any changes that occur via keyboard/or other desktop managers are reported in JSON format:
+       
+       ```{"visibleIndex":2,"visible":"Desktop 3"}```
+    * accepts all commands that can be used from the command line (ignores `/BREAK` and /`CONTINUE`, and `/INTERACTIVE`)
+
+    * implements `/NAMES`, which is a JSON version of `/LIST` (only supported in interactive mode)
+
+    * turns off `/VERBOSE` mode
+
+    * `/NEW` will switch to the newly created desktop automatically
+
+    * gives JSON responses to `/LEFT`, `/RIGHT`, `/NEXT`, `/PREVIOUS`, `/GCD`, `/NAMES`, `/NEW` (basically any command the in)
+
+    * valid JSON responses will always be on their own line (preceded by and followed by \n)
+
+    * doesn't filter out non-JSON responses, so anything reading piped output needs to keep this in mind.
 
 
 original readme follows:
