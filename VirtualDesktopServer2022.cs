@@ -1,5 +1,5 @@
-// Author: Markus Scholtes, 2023
-// Version 1.16, 2023-09-17
+// Author: Markus Scholtes, 2024
+// Version 1.17, 2024-02-14
 // Version for Windows Server 2022
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop.cs
@@ -17,11 +17,11 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2023")]
+[assembly:AssemblyCopyright("© Markus Scholtes 2024")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.16.0.0")]
-[assembly:AssemblyFileVersion("1.16.0.0")]
+[assembly:AssemblyVersion("1.17.0.0")]
+[assembly:AssemblyFileVersion("1.17.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -2549,7 +2549,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2023, v1.16\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2024, v1.17\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows Server 2022.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");

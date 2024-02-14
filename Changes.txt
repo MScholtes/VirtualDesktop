@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.17, 2024-02-14
+- version for Windows 11 build 22631.3085 and up
+
 Version 1.16, 2023-09-17
 - version for Windows 11 Insider Canary (build 25314 and up) called VirtualDesktop11InsiderCanary.cs
 - (re)introduced parameter /RemoveAll for all versions
