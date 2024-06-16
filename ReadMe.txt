@@ -19,8 +19,8 @@ https://www.powershellgallery.com/packages/VirtualDesktop)
 With Windows 11 23H2 Release 3085 Microsoft did change the API (COM GUIDs) for 
 accessing the functions for virtual desktops again. I provide five versions of 
 virtualdesktop.cs now: virtualdesktop.cs is for Windows 10, virtualdesktop11.cs 
-is for Windows 11 23H2 and Insider, virtualdesktop11-22h2.cs for Windows 11 22H2 
-release 2215 and newer, virtualdesktopserver2022.cs is for Windows Server 2022, 
+is for Windows 11, virtualdesktop11-24h2.cs for Windows 11 24H2 Insider, 
+virtualdesktopserver2022.cs is for Windows Server 2022, 
 virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all 
 executables will be generated.
 
