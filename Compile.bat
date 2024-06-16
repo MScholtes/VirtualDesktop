@@ -4,7 +4,7 @@
 setlocal
 
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop11.cs" /win32icon:"%~dp0MScholtes.ico"
-C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop11-22H2.cs" /win32icon:"%~dp0MScholtes.ico"
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop11-24H2.cs" /win32icon:"%~dp0MScholtes.ico"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktop.cs" /win32icon:"%~dp0MScholtes.ico"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktopServer2022.cs" /win32icon:"%~dp0MScholtes.ico"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe "%~dp0VirtualDesktopServer2016.cs" /win32icon:"%~dp0MScholtes.ico"

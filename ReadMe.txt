@@ -5,8 +5,10 @@ VirtualDesktop
 
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-Version 1.17, 2024-02-14
-- version for Windows 11 build 22631.3085 and up
+Version 1.18, 2024-06-16
+- quiet mode for parameter /RemoveAll
+- version for Windows 11 24H2 Insider
+- removed unnecessary version for Windows 11 22H2
 
 (look for a powershell version here:
 https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5

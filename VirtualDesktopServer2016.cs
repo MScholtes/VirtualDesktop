@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2024
-// Version 1.17, 2024-02-14
+// Version 1.18, 2024-06-16
 // Version for Windows 10 1607 to 1709 or Windows Server 2016
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop1607.cs
@@ -20,8 +20,8 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2024")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.17.0.0")]
-[assembly:AssemblyFileVersion("1.17.0.0")]
+[assembly:AssemblyVersion("1.18.0.0")]
+[assembly:AssemblyFileVersion("1.18.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -870,7 +870,7 @@ namespace VDeskTool
 
 							case "REMOVEALL": // remove all virtual desktops but visible
 							case "RA":
-								Console.WriteLine("Removing all virtual desktops but visible");
+								if (verbose) Console.WriteLine("Removing all virtual desktops but visible");
 								try
 								{ // remove all virtual desktops but visible
 									VirtualDesktop.Desktop.RemoveAll();
@@ -2438,7 +2438,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2024, v1.17\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2024, v1.18\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows Server 2016.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");

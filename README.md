@@ -3,12 +3,14 @@ C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
 **Pre-compiled binaries in Releases now**
 
-**Version 1.17, 2024-02-14**
-- version for Windows 11 build 22631.3085 and up
+**Version 1.18, 2024-06-16**
+- quiet mode for parameter /RemoveAll
+- version for Windows 11 24H2 Insider
+- removed unnecessary version for Windows 11 22H2
 
 (look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
-**With Windows 11 23H2 Release 3085 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide four versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10, virtualdesktop11.cs is for Windows 11, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all executables will be generated.**
+**With Windows 11 23H2 Release 3085 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide five versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10, virtualdesktop11.cs is for Windows 11 23H2 and Insider, virtualdesktop11-24h2.cs for Windows 11 24H2 Inside, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all executables will be generated.**
 
 ## Generate:
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10 or 11)
