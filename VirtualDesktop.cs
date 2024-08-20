@@ -729,9 +729,20 @@ Console.WriteLine("Name of desktop: " + desktopName);
 		// find first window with string in title
 		public static WindowInformation FindWindow(string WindowTitle)
 		{
-			WindowInformationList = new List<WindowInformation>();
-			EnumWindows(callBackPtr, IntPtr.Zero);
-			WindowInformation result = WindowInformationList.Find(x => x.Title.IndexOf(WindowTitle, StringComparison.OrdinalIgnoreCase) >= 0);
+			StringBuilder sb = new StringBuilder();
+			WindowInformation result = null;
+			EnumWindows((hWnd, lParam) =>
+			{
+				if (GetWindowText((IntPtr)hWnd, sb, sb.Capacity) > 0)
+				{
+					if (sb.ToString() == WindowTitle)
+					{
+						result = new WindowInformation {Handle = hWnd, Title = sb.ToString()};
+						return false;
+					}
+				}
+				return true;
+			}, IntPtr.Zero);
 			return result;
 		}
 	}
