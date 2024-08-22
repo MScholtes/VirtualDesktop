@@ -652,6 +652,8 @@ namespace VirtualDesktop
 			WindowInformation result = null;
 			EnumWindows((hWnd, lParam) =>
 			{
+				int length = GetWindowTextLength((IntPtr)hWnd);
+				sb.EnsureCapacity(length);
 				if (GetWindowText((IntPtr)hWnd, sb, sb.Capacity) > 0)
 				{
 					if (sb.ToString() == WindowTitle)
