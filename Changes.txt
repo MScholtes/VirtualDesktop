@@ -1,5 +1,9 @@
 Changes:
 
+Version 1.19, 2024-09-01
+- faster API call FindWindow instead of EnumWindows
+- Windows 11: animated switch to new desktop
+
 Version 1.18, 2024-06-16
 - quiet mode for parameter /RemoveAll
 - version for Windows 11 24H2 Insider

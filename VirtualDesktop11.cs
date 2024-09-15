@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2024
-// Version 1.18, 2024-06-16
+// Version 1.19, 2024-09-01
 // Version for Windows 11
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11.cs
@@ -20,8 +20,8 @@ using System.Reflection;
 [assembly:AssemblyCopyright("© Markus Scholtes 2024")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
-[assembly:AssemblyVersion("1.18.0.0")]
-[assembly:AssemblyFileVersion("1.18.0.0")]
+[assembly:AssemblyVersion("1.19.0.0")]
+[assembly:AssemblyFileVersion("1.19.0.0")]
 
 // Based on http://stackoverflow.com/a/32417530, Windows 10 SDK, github project Grabacr07/VirtualDesktop and own research
 
@@ -295,14 +295,12 @@ namespace VirtualDesktop
 	#endregion
 
 	#region public interface
-	public class WindowInformation
-	{ // stores window informations
-		public string Title { get; set; }
-		public int Handle { get; set; }
-	}
-
 	public class Desktop
 	{
+		// get window handle to class and window name
+		[DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
 		// get process id to window handle
 		[DllImport("user32.dll")]
 		private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
@@ -487,7 +485,7 @@ namespace VirtualDesktop
 		{ // remove all desktops but visible
 			int desktopcount = DesktopManager.VirtualDesktopManagerInternal.GetCount();
 			int desktopcurrent = DesktopManager.GetDesktopIndex(DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop());
-			
+
 			if (desktopcurrent < desktopcount-1)
 			{ // remove all desktops "right" from current
 				for (int i = desktopcount-1; i > desktopcurrent; i--)
@@ -529,11 +527,11 @@ namespace VirtualDesktop
 
 		public void MakeVisible()
 		{ // make this desktop visible
-			WindowInformation wi = FindWindow("Program Manager");
+			IntPtr hWnd = FindWindow("Progman", "Program Manager");
 
 			// activate desktop to prevent flashing icons in taskbar
 			int dummy;
-			uint DesktopThreadId = GetWindowThreadProcessId(new IntPtr(wi.Handle), out dummy);
+			uint DesktopThreadId = GetWindowThreadProcessId(hWnd, out dummy);
 			uint ForegroundThreadId = GetWindowThreadProcessId(GetForegroundWindow(), out dummy);
 			uint CurrentThreadId = GetCurrentThreadId();
 
@@ -541,15 +539,15 @@ namespace VirtualDesktop
 			{
 				AttachThreadInput(DesktopThreadId, CurrentThreadId, true);
 				AttachThreadInput(ForegroundThreadId, CurrentThreadId, true);
-				SetForegroundWindow(new IntPtr(wi.Handle));
+				SetForegroundWindow(hWnd);
 				AttachThreadInput(ForegroundThreadId, CurrentThreadId, false);
 				AttachThreadInput(DesktopThreadId, CurrentThreadId, false);
 			}
 
-			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(ivd);
+			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktopWithAnimation(ivd);
 
 			// direct desktop to give away focus
-			ShowWindow(new IntPtr(wi.Handle), SW_MINIMIZE);
+			ShowWindow(hWnd, SW_MINIMIZE);
 		}
 
 		public Desktop Left
@@ -678,55 +676,6 @@ namespace VirtualDesktop
 			{ // unpin only if pinned
 				DesktopManager.VirtualDesktopPinnedApps.UnpinAppID(appId);
 			}
-		}
-
-		// prepare callback function for window enumeration
-		private delegate bool CallBackPtr(int hwnd, int lParam);
-		private static CallBackPtr callBackPtr = Callback;
-		// list of window informations
-		private static List<WindowInformation> WindowInformationList = new List<WindowInformation>();
-
-		// enumerate windows
-		[DllImport("User32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool EnumWindows(CallBackPtr lpEnumFunc, IntPtr lParam);
-
-		// get window title length
-		[DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern int GetWindowTextLength(IntPtr hWnd);
-
-		// get window title
-		[DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-
-		// callback function for window enumeration
-		private static bool Callback(int hWnd, int lparam)
-		{
-			int length = GetWindowTextLength((IntPtr)hWnd);
-			if (length > 0)
-			{
-				StringBuilder sb = new StringBuilder(length + 1);
-				if (GetWindowText((IntPtr)hWnd, sb, sb.Capacity) > 0)
-				{ WindowInformationList.Add(new WindowInformation {Handle = hWnd, Title = sb.ToString()}); }
-			}
-			return true;
-		}
-
-		// get list of all windows with title
-		public static List<WindowInformation> GetWindows()
-		{
-			WindowInformationList = new List<WindowInformation>();
-			EnumWindows(callBackPtr, IntPtr.Zero);
-			return WindowInformationList;
-		}
-
-		// find first window with string in title
-		public static WindowInformation FindWindow(string WindowTitle)
-		{
-			WindowInformationList = new List<WindowInformation>();
-			EnumWindows(callBackPtr, IntPtr.Zero);
-			WindowInformation result = WindowInformationList.Find(x => x.Title.IndexOf(WindowTitle, StringComparison.OrdinalIgnoreCase) >= 0);
-			return result;
 		}
 	}
 	#endregion
@@ -2541,7 +2490,7 @@ namespace VDeskTool
 
 		static void HelpScreen()
 		{
-			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2024, v1.18\n");
+			Console.WriteLine("VirtualDesktop.exe\t\t\t\tMarkus Scholtes, 2024, v1.19\n");
 
 			Console.WriteLine("Command line tool to manage the virtual desktops of Windows 11.");
 			Console.WriteLine("Parameters can be given as a sequence of commands. The result - most of the");

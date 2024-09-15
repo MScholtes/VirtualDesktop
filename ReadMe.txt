@@ -5,13 +5,12 @@ VirtualDesktop
 
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-Version 1.18, 2024-06-16
-- quiet mode for parameter /RemoveAll
-- version for Windows 11 24H2 Insider
-- removed unnecessary version for Windows 11 22H2
+Version 1.19, 2024-09-01
+- faster API call FindWindow instead of EnumWindows
+- Windows 11: animated switch to new desktop
 
 (look for a powershell version here:
-https://gallery.technet.microsoft.com/Powershell-commands-to-d0e79cc5
+https://github.com/MScholtes/PSVirtualDesktop
 or here:
 https://www.powershellgallery.com/packages/VirtualDesktop)
 
