@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly:AssemblyConfiguration("")]
 [assembly:AssemblyCompany("MS")]
 [assembly:AssemblyProduct("VirtualDesktop")]
-[assembly:AssemblyCopyright("© Markus Scholtes 2024")]
+[assembly:AssemblyCopyright("\u00A9 Markus Scholtes 2024")]
 [assembly:AssemblyTrademark("")]
 [assembly:AssemblyCulture("")]
 [assembly:AssemblyVersion("1.19.0.0")]
@@ -525,7 +525,7 @@ namespace VirtualDesktop
 			get { return object.ReferenceEquals(ivd, DesktopManager.VirtualDesktopManagerInternal.GetCurrentDesktop()); }
 		}
 
-		public void MakeVisible()
+		public void MakeVisible(bool doAnimation)
 		{ // make this desktop visible
 			IntPtr hWnd = FindWindow("Progman", "Program Manager");
 
@@ -544,7 +544,11 @@ namespace VirtualDesktop
 				AttachThreadInput(DesktopThreadId, CurrentThreadId, false);
 			}
 
-			DesktopManager.VirtualDesktopManagerInternal.SwitchDesktopWithAnimation(ivd);
+			if (doAnimation) {
+				DesktopManager.VirtualDesktopManagerInternal.SwitchDesktopWithAnimation(ivd);
+			} else {
+				DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(ivd);
+			}
 
 			// direct desktop to give away focus
 			ShowWindow(hWnd, SW_MINIMIZE);
@@ -690,6 +694,7 @@ namespace VDeskTool
 		static bool breakonerror = true;
 		static bool wrapdesktops = false;
 		static int rc = 0;
+		static bool animate = true;
 
 		static int Main(string[] args)
 		{
@@ -730,6 +735,18 @@ namespace VDeskTool
 							case "V":
 								Console.WriteLine("Verbose mode enabled");
 								verbose = true;
+								break;
+
+							case "ANIMATE": // Use animation
+							case "A":
+								Console.WriteLine("Animation enabled");
+								animate = true;
+								break;
+
+							case "INSTANT": // Flip instantly
+							case "I":
+								Console.WriteLine("Animation disabled");
+								animate = false;
 								break;
 
 							case "BREAK": // break on error
@@ -815,7 +832,7 @@ namespace VDeskTool
 								if (verbose) Console.Write("Switching to virtual desktop number " + rc.ToString());
 								try
 								{ // activate virtual desktop rc
-									VirtualDesktop.Desktop.FromIndex(rc).MakeVisible();
+									VirtualDesktop.Desktop.FromIndex(rc).MakeVisible(animate);
 									if (verbose) Console.WriteLine(", desktop '" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "' is active now");
 								}
 								catch
@@ -831,9 +848,9 @@ namespace VDeskTool
 								try
 								{ // activate virtual desktop to the left
 									if (wrapdesktops && (VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current) == 0))
-										VirtualDesktop.Desktop.FromIndex(VirtualDesktop.Desktop.Count - 1).MakeVisible();
+										VirtualDesktop.Desktop.FromIndex(VirtualDesktop.Desktop.Count - 1).MakeVisible(animate);
 									else
-										VirtualDesktop.Desktop.Current.Left.MakeVisible();
+										VirtualDesktop.Desktop.Current.Left.MakeVisible(animate);
 									rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
 									if (verbose) Console.WriteLine(", desktop number " + rc.ToString() + " ('" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') is active now");
 								}
@@ -850,9 +867,9 @@ namespace VDeskTool
 								try
 								{ // activate virtual desktop to the right
 									if (wrapdesktops && (VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current) == VirtualDesktop.Desktop.Count - 1))
-										VirtualDesktop.Desktop.FromIndex(0).MakeVisible();
+										VirtualDesktop.Desktop.FromIndex(0).MakeVisible(animate);
 									else
-										VirtualDesktop.Desktop.Current.Right.MakeVisible();
+										VirtualDesktop.Desktop.Current.Right.MakeVisible(animate);
 									rc = VirtualDesktop.Desktop.FromDesktop(VirtualDesktop.Desktop.Current);
 									if (verbose) Console.WriteLine(", desktop number " + rc.ToString() + " ('" + VirtualDesktop.Desktop.DesktopNameFromIndex(rc) + "') is active now");
 								}
@@ -1141,7 +1158,7 @@ namespace VDeskTool
 										rc = iParam;
 										try
 										{ // activate virtual desktop iParam
-											VirtualDesktop.Desktop.FromIndex(iParam).MakeVisible();
+											VirtualDesktop.Desktop.FromIndex(iParam).MakeVisible(animate);
 										}
 										catch
 										{ // error while activating
@@ -1160,7 +1177,7 @@ namespace VDeskTool
 										rc = iParam;
 										try
 										{ // activate virtual desktop iParam
-											VirtualDesktop.Desktop.FromIndex(iParam).MakeVisible();
+											VirtualDesktop.Desktop.FromIndex(iParam).MakeVisible(animate);
 										}
 										catch
 										{ // error while activating
@@ -1176,7 +1193,7 @@ namespace VDeskTool
 											rc = iParam;
 											try
 											{ // activate virtual desktop iParam
-												VirtualDesktop.Desktop.FromIndex(iParam).MakeVisible();
+												VirtualDesktop.Desktop.FromIndex(iParam).MakeVisible(animate);
 											}
 											catch
 											{ // error while activating
@@ -2501,6 +2518,7 @@ namespace VDeskTool
 			Console.WriteLine("/Help /h /?      this help screen.");
 			Console.WriteLine("/Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).");
 			Console.WriteLine("/Break /Continue break (default) or continue on error (short: /b and /co).");
+			Console.WriteLine("/Animate /Instant  use animated transition (default) or instant (short: /a and /i).");
 			Console.WriteLine("/List            list all virtual desktops (short: /li).");
 			Console.WriteLine("/Count           get count of virtual desktops to pipeline (short: /c).");
 			Console.WriteLine("/GetDesktop:<n|s> get number of virtual desktop <n> or desktop with text <s> in");
