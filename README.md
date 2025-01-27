@@ -28,7 +28,7 @@ Virtual desktop numbers start with 0.
 
 **/Break /Continue** break (default) or continue on error (short: /b and /co).
 
-**/Animation:<s>**   Enable switch animations (default) with 'On' or '1' and disable switch animations with 'Off' or '0' (short: /anim)(only VirtualDesktop11.exe).
+**/Animation&lt;s&gt;**   Enable switch animations (default) with 'On' or '1' and disable switch animations with 'Off' or '0' (short: /anim)(only VirtualDesktop11.exe).
 
 **/List**            list all virtual desktops (short: /li).
 
