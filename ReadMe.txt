@@ -5,9 +5,11 @@ VirtualDesktop
 
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-Version 1.19, 2024-09-01
-- faster API call FindWindow instead of EnumWindows
-- Windows 11: animated switch to new desktop
+Version 1.20, 2025-01-18
+- new parameters /PinActiveWindow and /UnPinActiveWindow 
+- Windows 11: new parameter /Amimation to enable or disable animated desktop switches
+- nicer icon :-)
+- window handles can be negative
 
 (look for a powershell version here:
 https://github.com/MScholtes/PSVirtualDesktop
@@ -18,7 +20,7 @@ https://www.powershellgallery.com/packages/VirtualDesktop)
 With Windows 11 23H2 Release 3085 Microsoft did change the API (COM GUIDs) for 
 accessing the functions for virtual desktops again. I provide five versions of 
 virtualdesktop.cs now: virtualdesktop.cs is for Windows 10, virtualdesktop11.cs 
-is for Windows 11, virtualdesktop11-24h2.cs for Windows 11 24H2 Insider, 
+is for Windows 11, virtualdesktop11-24h2.cs for Windows 11 24H2, 
 virtualdesktopserver2022.cs is for Windows Server 2022, 
 virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all 
 executables will be generated.
@@ -38,6 +40,7 @@ Parameters (leading / can be omitted or - can be used instead):
 /Help /h /?      this help screen.
 /Verbose /Quiet  enable verbose (default) or quiet mode (short: /v and /q).
 /Break /Continue break (default) or continue on error (short: /b and /co).
+/Animation:<s>   Enable switch animations (default) with 'On' or '1' and disable switch animations with 'Off' or '0' (short: /anim)(only VirtualDesktop11.exe).
 /List            list all virtual desktops (short: /li).
 /Count           get count of virtual desktops to pipeline (short: /c).
 /GetDesktop:<n|s> get number of virtual desktop <n> or desktop with text <s> in name to pipeline (short: /gd).
@@ -67,8 +70,10 @@ Parameters (leading / can be omitted or - can be used instead):
 /ListWindowsOnDesktop[:<n|s>]  list handles of windows on desktop number <n>, desktop with text <s> in name or desktop with number in pipeline (short: /lwod).
 /CloseWindowsOnDesktop[:<n|s>]  close windows on desktop number <n>, desktop with text <s> in name or desktop with number in pipeline (short: /cwod).
 /PinWindow:<s|n>   pin process with name <s> or id <n> to all desktops (short: /pw).
+/PinActiveWindow  pin active window to all desktops (short: /paw).
 /PinWindowHandle:<s|n>   pin window with text <s> in title or handle <n> to all desktops (short: /pwh).
 /UnPinWindow:<s|n>  unpin process with name <s> or id <n> from all desktops (short: /upw).
+/UnPinActiveWindow  unpin active window from all desktops (short: /upaw).
 /UnPinWindowHandle:<s|n>  unpin window with text <s> in title or handle <n> from all desktops (short: /upwh).
 /IsWindowPinned:<s|n>  check if process with name <s> or id <n> is pinned to all desktops (short: /iwp). Returns 0 for yes, 1 for no.
 /IsWindowHandlePinned:<s|n>  check if window with text <s> in title or handle <n> is pinned to all desktops (short: /iwhp). Returns 0 for yes, 1 for no.

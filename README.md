@@ -1,15 +1,17 @@
 # VirtualDesktop
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-**Pre-compiled binaries in Releases now**
+**Pre-compiled binaries in Releases**
 
-**Version 1.19, 2024-09-01**
-- faster API call FindWindow instead of EnumWindows
-- Windows 11: animated switch to new desktop
+**Version 1.20, 2025-01-18**
+- new parameters /PinActiveWindow and /UnPinActiveWindow 
+- Windows 11: new parameter /Amimation to enable or disable animated desktop switches
+- nicer icon :-)
+- window handles can be negative
 
 (look for a powershell version here: https://github.com/MScholtes/PSVirtualDesktop or here: https://www.powershellgallery.com/packages/VirtualDesktop)
 
-**With Windows 11 23H2 Release 3085 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide five versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10, virtualdesktop11.cs is for Windows 11, virtualdesktop11-24h2.cs for Windows 11 24H2 Insider, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all executables will be generated.**
+**With Windows 11 23H2 Release 3085 Microsoft did change the API (COM GUIDs) for accessing the functions for virtual desktops again. I provide five versions of virtualdesktop.cs now: virtualdesktop.cs is for Windows 10, virtualdesktop11.cs is for Windows 11, virtualdesktop11-24h2.cs for Windows 11 24H2, virtualdesktopserver2022.cs is for Windows Server 2022, virtualdesktopserver2016.cs is for Windows Server 2016. Using Compile.bat all executables will be generated.**
 
 ## Generate:
 Compile with Compile.bat (no visual studio needed, but obviously Windows 10 or 11)
@@ -25,6 +27,8 @@ Virtual desktop numbers start with 0.
 **/Verbose /Quiet**  enable verbose (default) or quiet mode (short: /v and /q).
 
 **/Break /Continue** break (default) or continue on error (short: /b and /co).
+
+**/Animation:<s>**   Enable switch animations (default) with 'On' or '1' and disable switch animations with 'Off' or '0' (short: /anim)(only VirtualDesktop11.exe).
 
 **/List**            list all virtual desktops (short: /li).
 
@@ -84,9 +88,13 @@ Virtual desktop numbers start with 0.
 
 **/PinWindow:&lt;s|n&gt;**   pin process with name &lt;s&gt; or id &lt;n&gt; to all desktops (short: /pw).
 
+**/PinActiveWindow**  pin active window to all desktops (short: /paw).
+
 **/PinWindowHandle:&lt;s|n&gt;**   pin window with text &lt;s&gt; in title or handle &lt;n&gt; to all desktops (short: /pwh).
 
 **/UnPinWindow:&lt;s|n&gt;**  unpin process with name &lt;s&gt; or id &lt;n&gt; from all desktops (short: /upw).
+
+**/UnPinActiveWindow**  unpin active window from all desktops (short: /upaw).
 
 **/UnPinWindowHandle:&lt;s|n&gt;**  unpin window with text &lt;s&gt; in title or handle &lt;n&gt; from all desktops (short: /upwh).
 

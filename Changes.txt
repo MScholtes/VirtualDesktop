@@ -1,5 +1,11 @@
 Changes:
 
+Version 1.20, 2025-01-18
+- new parameters /PinActiveWindow and /UnPinActiveWindow 
+- Windows 11: new parameter /Amimation to enable or disable animated desktop switches
+- nicer icon :-)
+- window handles can be negative
+
 Version 1.19, 2024-09-01
 - faster API call FindWindow instead of EnumWindows
 - Windows 11: animated switch to new desktop
