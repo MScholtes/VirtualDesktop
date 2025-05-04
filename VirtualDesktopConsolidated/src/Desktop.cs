@@ -24,6 +24,49 @@ namespace VirtualDesktop.Consolidated
                 throw new NotSupportedException("Wallpaper setting not supported on this Windows version.");
             DesktopManager.ApiFacade.SetDesktopWallpaper(Index, path);
         }
+
+        public static string DesktopWallpaperFromIndex(int index)
+        {
+            if (!DesktopManager.ApiFacade.SupportsWallpaperSetting)
+                return string.Empty;
+            try
+            {
+                // Try to get wallpaper path via COM if available
+                // This requires casting to the correct API facade type
+                // We'll try Win11 and Win11_24H2, which support wallpaper
+                var api = DesktopManager.ApiFacade;
+                var type = api.GetType().Name;
+                if (type.Contains("Win11_24H2"))
+                {
+                    var method = api.GetType().GetMethod("GetDesktopName"); // Just to check type
+                    var desktopsField = api.GetType().GetField("_managerInternal", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (desktopsField != null)
+                    {
+                        dynamic managerInternal = desktopsField.GetValue(api);
+                        object desktops;
+                        managerInternal.GetDesktops(out desktops);
+                        object objDesktop;
+                        ((dynamic)desktops).GetAt(index, typeof(object).GUID, out objDesktop);
+                        return ((dynamic)objDesktop).GetWallpaperPath();
+                    }
+                }
+                else if (type.Contains("Win11"))
+                {
+                    var desktopsField = api.GetType().GetField("_managerInternal", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (desktopsField != null)
+                    {
+                        dynamic managerInternal = desktopsField.GetValue(api);
+                        object desktops;
+                        managerInternal.GetDesktops(out desktops);
+                        object objDesktop;
+                        ((dynamic)desktops).GetAt(index, typeof(object).GUID, out objDesktop);
+                        return ((dynamic)objDesktop).GetWallpaperPath();
+                    }
+                }
+            }
+            catch { }
+            return string.Empty;
+        }
         // Add other merged/forwarded methods as needed
     }
 } 

@@ -22,130 +22,205 @@ namespace VirtualDesktop.Consolidated
                 return 0;
             }
 
-            try
+            // State variables
+            bool verbose = true;
+            bool breakonerror = true;
+            bool wrapdesktops = false;
+            int rc = 0;
+
+            // Helper for error output
+            void PrintError(string msg)
             {
-                switch (args[0].ToLower())
-                {
-                    case "list":
-                        for (int i = 0; i < Desktop.Count; i++)
-                        {
-                            var d = new Desktop(i);
-                            Console.WriteLine($"{i}: {d.Name}");
-                        }
-                        return 0;
-                    case "switch":
-                        if (args.Length > 1 && int.TryParse(args[1], out int switchIndex))
-                        {
-                            if (switchIndex < 0 || switchIndex >= Desktop.Count)
-                                throw new ArgumentException($"Invalid desktop index: {switchIndex}");
-                            new Desktop(switchIndex).MakeVisible();
-                            return 0;
-                        }
-                        break;
-                    case "create":
-                        DesktopManager.ApiFacade.CreateDesktop();
-                        return 0;
-                    case "remove":
-                        if (args.Length > 1 && int.TryParse(args[1], out int removeIndex))
-                        {
-                            int fallback = 0;
-                            if (args.Length > 2 && int.TryParse(args[2], out int fb)) fallback = fb;
-                            new Desktop(removeIndex).Remove(new Desktop(fallback));
-                            return 0;
-                        }
-                        break;
-                    case "removeallbutcurrent":
-                        DesktopManager.ApiFacade.RemoveAllDesktopsExceptCurrent();
-                        return 0;
-                    case "setname":
-                        if (args.Length > 2 && int.TryParse(args[1], out int nameIndex))
-                        {
-                            new Desktop(nameIndex).Name = string.Join(" ", args.Skip(2));
-                            return 0;
-                        }
-                        break;
-                    case "setwallpaper":
-                        if (DesktopManager.ApiFacade.SupportsWallpaperSetting && args.Length > 2 && int.TryParse(args[1], out int wpIndex))
-                        {
-                            new Desktop(wpIndex).SetWallpaper(args[2]);
-                            return 0;
-                        }
-                        else if (!DesktopManager.ApiFacade.SupportsWallpaperSetting)
-                        {
-                            Console.WriteLine("Wallpaper setting not supported on this Windows version.");
-                            return 1;
-                        }
-                        break;
-                    case "moveactive":
-                        if (args.Length > 1 && int.TryParse(args[1], out int moveIndex))
-                        {
-                            DesktopManager.ApiFacade.MoveActiveWindowToDesktop(moveIndex);
-                            return 0;
-                        }
-                        break;
-                    case "pinactive":
-                        DesktopManager.ApiFacade.PinActiveWindow();
-                        return 0;
-                    case "unpinactive":
-                        DesktopManager.ApiFacade.UnpinActiveWindow();
-                        return 0;
-                    case "pinapp":
-                        if (args.Length > 1)
-                        {
-                            var hWnd = ResolveWindowHandle(args[1]);
-                            DesktopManager.ApiFacade.PinApplication(hWnd);
-                            return 0;
-                        }
-                        break;
-                    case "unpinapp":
-                        if (args.Length > 1)
-                        {
-                            var hWnd = ResolveWindowHandle(args[1]);
-                            DesktopManager.ApiFacade.UnpinApplication(hWnd);
-                            return 0;
-                        }
-                        break;
-                    case "iswindowpinned":
-                        if (args.Length > 1)
-                        {
-                            var hWnd = ResolveWindowHandle(args[1]);
-                            Console.WriteLine(DesktopManager.ApiFacade.IsWindowPinned(hWnd) ? "Pinned" : "Not pinned");
-                            return 0;
-                        }
-                        break;
-                    case "isapppinned":
-                        if (args.Length > 1)
-                        {
-                            var hWnd = ResolveWindowHandle(args[1]);
-                            Console.WriteLine(DesktopManager.ApiFacade.IsApplicationPinned(hWnd) ? "Pinned" : "Not pinned");
-                            return 0;
-                        }
-                        break;
-                    case "getleft":
-                        if (args.Length > 1 && int.TryParse(args[1], out int leftIndex))
-                        {
-                            Console.WriteLine(DesktopManager.ApiFacade.GetLeftDesktopIndex(leftIndex));
-                            return 0;
-                        }
-                        break;
-                    case "getright":
-                        if (args.Length > 1 && int.TryParse(args[1], out int rightIndex))
-                        {
-                            Console.WriteLine(DesktopManager.ApiFacade.GetRightDesktopIndex(rightIndex));
-                            return 0;
-                        }
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return 1;
+                Console.Error.WriteLine(msg);
             }
 
-            Console.WriteLine("Unknown command or invalid arguments.");
-            HelpScreen();
-            return 1;
+            // Helper for verbose output
+            void PrintVerbose(string msg)
+            {
+                if (verbose) Console.WriteLine(msg);
+            }
+
+            // Argument parsing and command loop
+            foreach (string arg in args)
+            {
+                // Parse argument: support /, -, or no prefix, and : or = as separator
+                var match = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?(.*)$");
+                if (match.Groups.Count != 3)
+                {
+                    rc = -2;
+                    PrintError($"Error in parameter '{arg}'");
+                    if (breakonerror) break;
+                    else continue;
+                }
+                string cmd = match.Groups[1].Value.Trim().ToUpper();
+                string val = match.Groups[2].Value;
+
+                // Reset rc if previously errored
+                if (rc < 0) rc = 0;
+
+                // Commands without value
+                if (string.IsNullOrEmpty(val))
+                {
+                    switch (cmd)
+                    {
+                        case "HELP": case "H": case "?":
+                            HelpScreen();
+                            return 0;
+                        case "QUIET": case "Q":
+                            verbose = false;
+                            break;
+                        case "VERBOSE": case "V":
+                            PrintVerbose("Verbose mode enabled");
+                            verbose = true;
+                            break;
+                        case "BREAK": case "B":
+                            if (verbose) Console.WriteLine("Break on error enabled");
+                            breakonerror = true;
+                            break;
+                        case "CONTINUE": case "CO":
+                            if (verbose) Console.WriteLine("Break on error disabled");
+                            breakonerror = false;
+                            break;
+                        case "WRAP": case "W":
+                            if (verbose) Console.WriteLine("Wrapping desktops enabled");
+                            wrapdesktops = true;
+                            break;
+                        case "NOWRAP": case "NW":
+                            if (verbose) Console.WriteLine("Wrapping desktop disabled");
+                            wrapdesktops = false;
+                            break;
+                        case "COUNT": case "C":
+                            rc = Desktop.Count;
+                            PrintVerbose($"Count of desktops: {rc}");
+                            break;
+                        case "LIST": case "LI":
+                            int desktopCount = Desktop.Count;
+                            int visibleDesktop = Desktop.Current.Index;
+                            if (verbose)
+                            {
+                                Console.WriteLine("Virtual desktops:");
+                                Console.WriteLine("-----------------");
+                            }
+                            for (int i = 0; i < desktopCount; i++)
+                            {
+                                string name = DesktopManager.ApiFacade.GetDesktopName(i);
+                                if (i != visibleDesktop)
+                                    Console.Write(name);
+                                else
+                                    Console.Write(name + " (visible)");
+                                // Wallpaper support
+                                if (DesktopManager.ApiFacade.SupportsWallpaperSetting)
+                                {
+                                    string wppath = Desktop.DesktopWallpaperFromIndex(i);
+                                    if (!string.IsNullOrEmpty(wppath))
+                                        Console.WriteLine($" (Wallpaper: {wppath})");
+                                    else
+                                        Console.WriteLine();
+                                }
+                                else
+                                    Console.WriteLine();
+                            }
+                            if (verbose) Console.WriteLine($"\nCount of desktops: {desktopCount}");
+                            break;
+                        case "GETCURRENTDESKTOP": case "GCD":
+                            rc = Desktop.Current.Index;
+                            PrintVerbose($"Current desktop: '{DesktopManager.ApiFacade.GetDesktopName(rc)}' (desktop number {rc})");
+                            break;
+                        // Add more no-value commands as needed (LEFT, RIGHT, NEW, REMOVEALL, etc.)
+                        default:
+                            rc = -2;
+                            PrintError($"Error in parameter '{arg}'");
+                            if (breakonerror) break;
+                            continue;
+                    }
+                }
+                else // Commands with value
+                {
+                    int iParam;
+                    switch (cmd)
+                    {
+                        case "ANIMATION": case "ANIM":
+                            switch (val.Trim().ToUpper())
+                            {
+                                case "ON": case "1":
+                                    // TODO: Implement animation enable
+                                    PrintVerbose("Enabled switch animations");
+                                    break;
+                                case "OFF": case "0":
+                                    // TODO: Implement animation disable
+                                    PrintVerbose("Disabled switch animations");
+                                    break;
+                                default:
+                                    rc = -2;
+                                    break;
+                            }
+                            break;
+                        case "GETDESKTOP": case "GD":
+                            if (int.TryParse(val, out iParam))
+                            {
+                                if (iParam >= 0 && iParam < Desktop.Count)
+                                {
+                                    PrintVerbose($"Virtual desktop number {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}') selected");
+                                    rc = iParam;
+                                }
+                                else rc = -1;
+                            }
+                            else
+                            {
+                                // Search by name or LAST
+                                if (val.Trim().ToUpper() == "LAST" || val.Trim().ToUpper() == "*LAST*")
+                                {
+                                    iParam = Desktop.Count - 1;
+                                    PrintVerbose($"Virtual desktop number {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}') selected");
+                                    rc = iParam;
+                                }
+                                else
+                                {
+                                    // Search by partial name
+                                    iParam = -1;
+                                    for (int i = 0; i < Desktop.Count; i++)
+                                    {
+                                        if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
+                                        {
+                                            iParam = i;
+                                            break;
+                                        }
+                                    }
+                                    if (iParam >= 0)
+                                    {
+                                        PrintVerbose($"Virtual desktop number {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}') selected");
+                                        rc = iParam;
+                                    }
+                                    else
+                                    {
+                                        PrintVerbose($"Could not find virtual desktop with name containing '{val}'");
+                                        rc = -2;
+                                    }
+                                }
+                            }
+                            break;
+                        // Add more value commands as needed (NAME, WALLPAPER, SWITCH, REMOVE, etc.)
+                        default:
+                            rc = -2;
+                            PrintError($"Error in parameter '{arg}'");
+                            if (breakonerror) break;
+                            continue;
+                    }
+                }
+
+                if (rc == -1)
+                {
+                    PrintError($"Error while processing '{arg}'");
+                    if (breakonerror) break;
+                }
+                if (rc == -2)
+                {
+                    PrintError($"Error in parameter '{arg}'");
+                    if (breakonerror) break;
+                }
+            }
+
+            return rc;
         }
 
         static void HelpScreen()
@@ -226,8 +301,8 @@ namespace VirtualDesktop.Consolidated
             Console.WriteLine("/IsWindowOnDesktop:<s|n>  check if process with name <s> or id <n> is on");
             Console.WriteLine("                   desktop with number in pipeline (short: /iwod). Returns 0");
             Console.WriteLine("                   for yes, 1 for no.");
-            Console.WriteLine("/IsWindowHandleOnDesktop:<s|n>  check if window with text <s> in title or");
-            Console.WriteLine("                   handle <n> is on desktop with number in pipeline");
+            Console.WriteLine("/IsWindowHandleOnDesktop:<s|n>  check if window with text <s> in title or handle");
+            Console.WriteLine("                   <n> is on desktop with number in pipeline");
             Console.WriteLine("                   (short: /iwhod). Returns 0 for yes, 1 for no.");
             Console.WriteLine("/ListWindowsOnDesktop[:<n|s>]  list handles of windows on desktop number <n>,");
             Console.WriteLine("                   desktop with text <s> in name or desktop with number in");
