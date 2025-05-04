@@ -232,7 +232,7 @@ namespace VirtualDesktop.Consolidated
                             else
                             {
                                 iParam = -1;
-                                for (int i = 0; i < Desktop.Count; i++)
+                                for (int i = Desktop.Count - 1; i >= 0; i--)
                                 {
                                     if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
                                     {
@@ -295,7 +295,7 @@ namespace VirtualDesktop.Consolidated
                             else
                             {
                                 iParam = -1;
-                                for (int i = 0; i < Desktop.Count; i++)
+                                for (int i = Desktop.Count - 1; i >= 0; i--)
                                 {
                                     if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
                                     {
@@ -400,7 +400,7 @@ namespace VirtualDesktop.Consolidated
                                 {
                                     // Search by partial name
                                     iParam = -1;
-                                    for (int i = 0; i < Desktop.Count; i++)
+                                    for (int i = Desktop.Count - 1; i >= 0; i--)
                                     {
                                         if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
                                         {
@@ -491,7 +491,7 @@ namespace VirtualDesktop.Consolidated
                             else
                             {
                                 iParam = -1;
-                                for (int i = 0; i < Desktop.Count; i++)
+                                for (int i = Desktop.Count - 1; i >= 0; i--)
                                 {
                                     if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
                                     {
@@ -553,7 +553,7 @@ namespace VirtualDesktop.Consolidated
                             else
                             {
                                 iParam = -1;
-                                for (int i = 0; i < Desktop.Count; i++)
+                                for (int i = Desktop.Count - 1; i >= 0; i--)
                                 {
                                     if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
                                     {
