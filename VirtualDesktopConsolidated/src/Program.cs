@@ -108,7 +108,6 @@ namespace VirtualDesktop.Consolidated
                                     Console.Write(name);
                                 else
                                     Console.Write(name + " (visible)");
-                                // Wallpaper support
                                 if (DesktopManager.ApiFacade.SupportsWallpaperSetting)
                                 {
                                     string wppath = Desktop.DesktopWallpaperFromIndex(i);
@@ -126,7 +125,230 @@ namespace VirtualDesktop.Consolidated
                             rc = Desktop.Current.Index;
                             PrintVerbose($"Current desktop: '{DesktopManager.ApiFacade.GetDesktopName(rc)}' (desktop number {rc})");
                             break;
-                        // Add more no-value commands as needed (LEFT, RIGHT, NEW, REMOVEALL, etc.)
+                        case "NEW": case "N":
+                            try
+                            {
+                                DesktopManager.ApiFacade.CreateDesktop();
+                                rc = Desktop.Count - 1;
+                                PrintVerbose($"Created new desktop, number {rc}");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error creating new desktop");
+                            }
+                            break;
+                        case "REMOVEALL": case "RA":
+                            try
+                            {
+                                DesktopManager.ApiFacade.RemoveAllDesktopsExceptCurrent();
+                                PrintVerbose("Removed all desktops but visible");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error removing all desktops but visible");
+                            }
+                            break;
+                        case "LEFT": case "L":
+                            try
+                            {
+                                int left = DesktopManager.ApiFacade.GetLeftDesktopIndex(Desktop.Current.Index);
+                                if (wrapdesktops && left == -1)
+                                    left = Desktop.Count - 1;
+                                if (left >= 0)
+                                {
+                                    DesktopManager.ApiFacade.SwitchDesktop(left);
+                                    rc = left;
+                                    PrintVerbose($"Switched to left desktop {left}");
+                                }
+                                else
+                                {
+                                    rc = -1;
+                                    PrintError("No left desktop");
+                                }
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error switching to left desktop");
+                            }
+                            break;
+                        case "RIGHT": case "RI":
+                            try
+                            {
+                                int right = DesktopManager.ApiFacade.GetRightDesktopIndex(Desktop.Current.Index);
+                                if (wrapdesktops && right == -1)
+                                    right = 0;
+                                if (right >= 0)
+                                {
+                                    DesktopManager.ApiFacade.SwitchDesktop(right);
+                                    rc = right;
+                                    PrintVerbose($"Switched to right desktop {right}");
+                                }
+                                else
+                                {
+                                    rc = -1;
+                                    PrintError("No right desktop");
+                                }
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error switching to right desktop");
+                            }
+                            break;
+                        case "SWITCH": case "S":
+                            int iParam = -1;
+                            if (int.TryParse(val, out iParam))
+                            {
+                                try
+                                {
+                                    DesktopManager.ApiFacade.SwitchDesktop(iParam);
+                                    rc = iParam;
+                                    PrintVerbose($"Switched to desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error switching desktop");
+                                }
+                            }
+                            else if (val.Trim().ToUpper() == "LAST" || val.Trim().ToUpper() == "*LAST*")
+                            {
+                                iParam = Desktop.Count - 1;
+                                try
+                                {
+                                    DesktopManager.ApiFacade.SwitchDesktop(iParam);
+                                    rc = iParam;
+                                    PrintVerbose($"Switched to last desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error switching to last desktop");
+                                }
+                            }
+                            else
+                            {
+                                iParam = -1;
+                                for (int i = 0; i < Desktop.Count; i++)
+                                {
+                                    if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
+                                    {
+                                        iParam = i;
+                                        break;
+                                    }
+                                }
+                                if (iParam >= 0)
+                                {
+                                    try
+                                    {
+                                        DesktopManager.ApiFacade.SwitchDesktop(iParam);
+                                        rc = iParam;
+                                        PrintVerbose($"Switched to desktop {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}')");
+                                    }
+                                    catch
+                                    {
+                                        rc = -1;
+                                        PrintError("Error switching desktop by name");
+                                    }
+                                }
+                                else
+                                {
+                                    rc = -2;
+                                    PrintError($"Could not find virtual desktop with name containing '{val}'");
+                                }
+                            }
+                            break;
+                        case "REMOVE": case "R":
+                            iParam = -1;
+                            if (int.TryParse(val, out iParam))
+                            {
+                                try
+                                {
+                                    DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
+                                    rc = iParam;
+                                    PrintVerbose($"Removed desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error removing desktop");
+                                }
+                            }
+                            else if (val.Trim().ToUpper() == "LAST" || val.Trim().ToUpper() == "*LAST*")
+                            {
+                                iParam = Desktop.Count - 1;
+                                try
+                                {
+                                    DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
+                                    rc = iParam;
+                                    PrintVerbose($"Removed last desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error removing last desktop");
+                                }
+                            }
+                            else
+                            {
+                                iParam = -1;
+                                for (int i = 0; i < Desktop.Count; i++)
+                                {
+                                    if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
+                                    {
+                                        iParam = i;
+                                        break;
+                                    }
+                                }
+                                if (iParam >= 0)
+                                {
+                                    try
+                                    {
+                                        DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
+                                        rc = iParam;
+                                        PrintVerbose($"Removed desktop {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}')");
+                                    }
+                                    catch
+                                    {
+                                        rc = -1;
+                                        PrintError("Error removing desktop by name");
+                                    }
+                                }
+                                else
+                                {
+                                    rc = -2;
+                                    PrintError($"Could not find virtual desktop with name containing '{val}'");
+                                }
+                            }
+                            break;
+                        case "PINACTIVEWINDOW": case "PAW":
+                            try
+                            {
+                                DesktopManager.ApiFacade.PinActiveWindow();
+                                PrintVerbose("Active window pinned");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Pinning of active window failed");
+                            }
+                            break;
+                        case "UNPINACTIVEWINDOW": case "UPAW":
+                            try
+                            {
+                                DesktopManager.ApiFacade.UnpinActiveWindow();
+                                PrintVerbose("Active window unpinned");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Unpinning of active window failed");
+                            }
+                            break;
+                        // Add more no-value commands as needed
                         default:
                             rc = -2;
                             PrintError($"Error in parameter '{arg}'");
@@ -136,7 +358,7 @@ namespace VirtualDesktop.Consolidated
                 }
                 else // Commands with value
                 {
-                    int iParam;
+                    int iParam = -1;
                     switch (cmd)
                     {
                         case "ANIMATION": case "ANIM":
@@ -199,7 +421,168 @@ namespace VirtualDesktop.Consolidated
                                 }
                             }
                             break;
-                        // Add more value commands as needed (NAME, WALLPAPER, SWITCH, REMOVE, etc.)
+                        case "NAME": case "NA":
+                            try
+                            {
+                                DesktopManager.ApiFacade.SetDesktopName(rc, val);
+                                PrintVerbose($"Set name of desktop {rc} to '{val}'");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error setting desktop name");
+                            }
+                            break;
+                        case "WALLPAPER": case "WP":
+                            try
+                            {
+                                DesktopManager.ApiFacade.SetDesktopWallpaper(rc, val);
+                                PrintVerbose($"Set wallpaper of desktop {rc} to '{val}'");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error setting wallpaper");
+                            }
+                            break;
+                        case "ALLWALLPAPERS": case "AWP":
+                            try
+                            {
+                                for (int i = 0; i < Desktop.Count; i++)
+                                    DesktopManager.ApiFacade.SetDesktopWallpaper(i, val);
+                                PrintVerbose($"Set wallpaper of all desktops to '{val}'");
+                            }
+                            catch
+                            {
+                                rc = -1;
+                                PrintError("Error setting wallpaper for all desktops");
+                            }
+                            break;
+                        case "SWITCH": case "S":
+                            if (int.TryParse(val, out iParam))
+                            {
+                                try
+                                {
+                                    DesktopManager.ApiFacade.SwitchDesktop(iParam);
+                                    rc = iParam;
+                                    PrintVerbose($"Switched to desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error switching desktop");
+                                }
+                            }
+                            else if (val.Trim().ToUpper() == "LAST" || val.Trim().ToUpper() == "*LAST*")
+                            {
+                                iParam = Desktop.Count - 1;
+                                try
+                                {
+                                    DesktopManager.ApiFacade.SwitchDesktop(iParam);
+                                    rc = iParam;
+                                    PrintVerbose($"Switched to last desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error switching to last desktop");
+                                }
+                            }
+                            else
+                            {
+                                iParam = -1;
+                                for (int i = 0; i < Desktop.Count; i++)
+                                {
+                                    if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
+                                    {
+                                        iParam = i;
+                                        break;
+                                    }
+                                }
+                                if (iParam >= 0)
+                                {
+                                    try
+                                    {
+                                        DesktopManager.ApiFacade.SwitchDesktop(iParam);
+                                        rc = iParam;
+                                        PrintVerbose($"Switched to desktop {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}')");
+                                    }
+                                    catch
+                                    {
+                                        rc = -1;
+                                        PrintError("Error switching desktop by name");
+                                    }
+                                }
+                                else
+                                {
+                                    rc = -2;
+                                    PrintError($"Could not find virtual desktop with name containing '{val}'");
+                                }
+                            }
+                            break;
+                        case "REMOVE": case "R":
+                            if (int.TryParse(val, out iParam))
+                            {
+                                try
+                                {
+                                    DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
+                                    rc = iParam;
+                                    PrintVerbose($"Removed desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error removing desktop");
+                                }
+                            }
+                            else if (val.Trim().ToUpper() == "LAST" || val.Trim().ToUpper() == "*LAST*")
+                            {
+                                iParam = Desktop.Count - 1;
+                                try
+                                {
+                                    DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
+                                    rc = iParam;
+                                    PrintVerbose($"Removed last desktop {iParam}");
+                                }
+                                catch
+                                {
+                                    rc = -1;
+                                    PrintError("Error removing last desktop");
+                                }
+                            }
+                            else
+                            {
+                                iParam = -1;
+                                for (int i = 0; i < Desktop.Count; i++)
+                                {
+                                    if (DesktopManager.ApiFacade.GetDesktopName(i).ToUpper().Contains(val.Trim().ToUpper()))
+                                    {
+                                        iParam = i;
+                                        break;
+                                    }
+                                }
+                                if (iParam >= 0)
+                                {
+                                    try
+                                    {
+                                        DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
+                                        rc = iParam;
+                                        PrintVerbose($"Removed desktop {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}')");
+                                    }
+                                    catch
+                                    {
+                                        rc = -1;
+                                        PrintError("Error removing desktop by name");
+                                    }
+                                }
+                                else
+                                {
+                                    rc = -2;
+                                    PrintError($"Could not find virtual desktop with name containing '{val}'");
+                                }
+                            }
+                            break;
+                        // Add more value commands as needed (MOVEWINDOW, PINWINDOW, etc.)
                         default:
                             rc = -2;
                             PrintError($"Error in parameter '{arg}'");
