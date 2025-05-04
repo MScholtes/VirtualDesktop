@@ -267,9 +267,10 @@ namespace VirtualDesktop.Consolidated
                             {
                                 try
                                 {
+                                    string desktopName = DesktopManager.ApiFacade.GetDesktopName(iParam);
                                     DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
                                     rc = iParam;
-                                    PrintVerbose($"Removed desktop {iParam}");
+                                    PrintVerbose($"Removed desktop {iParam} ('{desktopName}')");
                                 }
                                 catch
                                 {
@@ -282,9 +283,10 @@ namespace VirtualDesktop.Consolidated
                                 iParam = Desktop.Count - 1;
                                 try
                                 {
+                                    string desktopName = DesktopManager.ApiFacade.GetDesktopName(iParam);
                                     DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
                                     rc = iParam;
-                                    PrintVerbose($"Removed last desktop {iParam}");
+                                    PrintVerbose($"Removed last desktop {iParam} ('{desktopName}')");
                                 }
                                 catch
                                 {
@@ -307,9 +309,10 @@ namespace VirtualDesktop.Consolidated
                                 {
                                     try
                                     {
+                                        string desktopName = DesktopManager.ApiFacade.GetDesktopName(iParam);
                                         DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
                                         rc = iParam;
-                                        PrintVerbose($"Removed desktop {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}')");
+                                        PrintVerbose($"Removed desktop {iParam} ('{desktopName}')");
                                     }
                                     catch
                                     {
@@ -525,9 +528,10 @@ namespace VirtualDesktop.Consolidated
                             {
                                 try
                                 {
+                                    string desktopName = DesktopManager.ApiFacade.GetDesktopName(iParam);
                                     DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
                                     rc = iParam;
-                                    PrintVerbose($"Removed desktop {iParam}");
+                                    PrintVerbose($"Removed desktop {iParam} ('{desktopName}')");
                                 }
                                 catch
                                 {
@@ -540,9 +544,10 @@ namespace VirtualDesktop.Consolidated
                                 iParam = Desktop.Count - 1;
                                 try
                                 {
+                                    string desktopName = DesktopManager.ApiFacade.GetDesktopName(iParam);
                                     DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
                                     rc = iParam;
-                                    PrintVerbose($"Removed last desktop {iParam}");
+                                    PrintVerbose($"Removed last desktop {iParam} ('{desktopName}')");
                                 }
                                 catch
                                 {
@@ -565,9 +570,10 @@ namespace VirtualDesktop.Consolidated
                                 {
                                     try
                                     {
+                                        string desktopName = DesktopManager.ApiFacade.GetDesktopName(iParam);
                                         DesktopManager.ApiFacade.RemoveDesktop(iParam, 0);
                                         rc = iParam;
-                                        PrintVerbose($"Removed desktop {iParam} ('{DesktopManager.ApiFacade.GetDesktopName(iParam)}')");
+                                        PrintVerbose($"Removed desktop {iParam} ('{desktopName}')");
                                     }
                                     catch
                                     {
