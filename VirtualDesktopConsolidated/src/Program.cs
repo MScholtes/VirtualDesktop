@@ -9,7 +9,35 @@ namespace VirtualDesktop.Consolidated
     {
         static int Main(string[] args)
         {
-            Console.WriteLine("Detected Windows API Version: " + WindowsVersion.ApiVersion);
+            // State variables
+            bool verbose = true;
+            bool breakonerror = true;
+            bool wrapdesktops = false;
+            int rc = 0;
+
+            // Check for quiet mode early
+            if (args.Length > 0)
+            {
+                foreach (string arg in args)
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(arg, @"^[-\/]?([^:=]+)[:=]?(.*)$");
+                    if (match.Groups.Count == 3)
+                    {
+                        string cmd = match.Groups[1].Value.Trim().ToUpper();
+                        if (cmd == "QUIET" || cmd == "Q")
+                        {
+                            verbose = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (verbose)
+            {
+                Console.WriteLine("Detected Windows API Version: " + WindowsVersion.ApiVersion);
+            }
+            
             if (WindowsVersion.ApiVersion == WindowsVersion.WindowsApiVersion.Unknown)
             {
                 Console.WriteLine("Unsupported or undetected Windows version. Exiting.");
@@ -21,12 +49,6 @@ namespace VirtualDesktop.Consolidated
                 HelpScreen();
                 return 0;
             }
-
-            // State variables
-            bool verbose = true;
-            bool breakonerror = true;
-            bool wrapdesktops = false;
-            int rc = 0;
 
             // Helper for error output
             void PrintError(string msg)
