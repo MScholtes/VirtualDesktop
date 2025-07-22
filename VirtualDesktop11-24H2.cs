@@ -1,5 +1,5 @@
 // Author: Markus Scholtes, 2025
-// Version 1.20, 2025-01-18
+// Version 1.20b, 2025-07-22
 // Version for Windows 11 24H2 Insider
 // Compile with:
 // C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe VirtualDesktop11-24H2.cs
@@ -535,21 +535,30 @@ namespace VirtualDesktop
 
 		public void MakeVisible()
 		{ // make this desktop visible
-			IntPtr hWnd = FindWindow("Progman", "Program Manager");
-
-			// activate desktop to prevent flashing icons in taskbar
-			int dummy;
-			uint DesktopThreadId = GetWindowThreadProcessId(hWnd, out dummy);
-			uint ForegroundThreadId = GetWindowThreadProcessId(GetForegroundWindow(), out dummy);
-			uint CurrentThreadId = GetCurrentThreadId();
-
-			if ((DesktopThreadId != 0) && (ForegroundThreadId != 0) && (ForegroundThreadId != CurrentThreadId))
+			IntPtr hWnd;
+			if (AnimateDesktopSwitch)
 			{
-				AttachThreadInput(DesktopThreadId, CurrentThreadId, true);
-				AttachThreadInput(ForegroundThreadId, CurrentThreadId, true);
-				SetForegroundWindow(hWnd);
-				AttachThreadInput(ForegroundThreadId, CurrentThreadId, false);
-				AttachThreadInput(DesktopThreadId, CurrentThreadId, false);
+				hWnd = FindWindow("Shell_TrayWnd", "");
+			} else {
+				hWnd = FindWindow("XamlExplorerHostIslandWindow", null);
+			}
+
+			if (hWnd != (IntPtr)0)
+			{
+				// activate taskbar to prevent flashing icons in taskbar
+				int dummy;
+				uint DesktopThreadId = GetWindowThreadProcessId(hWnd, out dummy);
+				uint ForegroundThreadId = GetWindowThreadProcessId(GetForegroundWindow(), out dummy);
+				uint CurrentThreadId = GetCurrentThreadId();
+
+				if ((DesktopThreadId != 0) && (ForegroundThreadId != 0) && (ForegroundThreadId != CurrentThreadId))
+				{
+					AttachThreadInput(DesktopThreadId, CurrentThreadId, true);
+					AttachThreadInput(ForegroundThreadId, CurrentThreadId, true);
+					SetForegroundWindow(hWnd);
+					AttachThreadInput(ForegroundThreadId, CurrentThreadId, false);
+					AttachThreadInput(DesktopThreadId, CurrentThreadId, false);
+				}
 			}
 
 			if (AnimateDesktopSwitch)
@@ -559,8 +568,8 @@ namespace VirtualDesktop
 				DesktopManager.VirtualDesktopManagerInternal.SwitchDesktop(ivd);
 			}
 
-			// direct desktop to give away focus
-			ShowWindow(hWnd, SW_MINIMIZE);
+			// direct taskbar to give away focus
+			if (hWnd != (IntPtr)0) { ShowWindow(hWnd, SW_MINIMIZE); }
 		}
 
 		public Desktop Left
