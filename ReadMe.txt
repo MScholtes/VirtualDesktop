@@ -5,11 +5,8 @@ VirtualDesktop
 
 C# command line tool to manage virtual desktops in Windows 10 and Windows 11
 
-Version 1.20, 2025-01-18
-- new parameters /PinActiveWindow and /UnPinActiveWindow 
-- Windows 11: new parameter /Amimation to enable or disable animated desktop switches
-- nicer icon :-)
-- window handles can be negative
+Version 1.21, 2025-08-11
+- bugfix: simultaneous calls of animated switch function no longer cause Windows Explorer to crash
 
 (look for a powershell version here:
 https://github.com/MScholtes/PSVirtualDesktop

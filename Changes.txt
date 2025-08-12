@@ -1,5 +1,8 @@
 Changes:
 
+Version 1.21, 2025-08-11
+- bugfix: simultaneous calls of animated switch function no longer cause Windows Explorer to crash
+
 Version 1.20, 2025-01-18
 - new parameters /PinActiveWindow and /UnPinActiveWindow 
 - Windows 11: new parameter /Amimation to enable or disable animated desktop switches
